@@ -1,39 +1,44 @@
-import React, { useState, useEffect } from 'react';
-import { Switch, Route, Link, withRouter } from 'react-router-dom';
-import Login from './pages/login.jsx';
-import NavBar from './components/NavBar.jsx';
-import Home from './pages/Home.jsx';
-import Profile from './pages/Profile.jsx';
-import Matches from './pages/Matches.jsx';
+import React, { useState, useEffect } from "react";
+import { Switch, Route, Link, withRouter } from "react-router-dom";
+import Login from "./pages/login.jsx";
+import NavBar from "./components/NavBar.jsx";
+import Home from "./pages/Home.jsx";
+import Profile from "./pages/Profile.jsx";
+import Matches from "./pages/Matches.jsx";
 
 const App = React.memo(() => {
   const [user, setUser] = useState({});
 
-  const handleSetUser = (username) => {
-    setUser((prevUsername)=> prevUsername = username);
+  const handleSetUser = (userObj) => {
+    //setUser((prevUsername) => (prevUsername = username));
+    setUser(userObj);
   };
 
   const handleSetUserInfo = (userInfo) => {
-    setUserInfo((prevUserInfo) => prevUserInfo = userInfo);
-  }
+    setUserInfo((prevUserInfo) => (prevUserInfo = userInfo));
+  };
 
   return (
-    <div className='mainContainer'>
+    <div className="mainContainer">
       <Switch>
-        <Route path='/home'>
+        <Route path="/home">
           <NavBar />
           <Home user={user} />
         </Route>
-        <Route path='/profile'>
+        <Route path="/profile">
           <NavBar />
           <Profile user={user} />
         </Route>
-        <Route path='/matches'>
+        <Route path="/matches">
           <NavBar />
           <Matches user={user} />
         </Route>
-        <Route path='/'>
-          <Login handleSetUser={handleSetUser} user={user} handleSetUserInfo={handleSetUserInfo}/>
+        <Route path="/">
+          <Login
+            handleSetUser={handleSetUser}
+            user={user}
+            handleSetUserInfo={handleSetUserInfo}
+          />
         </Route>
       </Switch>
     </div>
@@ -56,7 +61,7 @@ const App = React.memo(() => {
 // styles for profile
 
 const profileStyles = {
-  padding: '5px 20px',
+  padding: "5px 20px",
 };
 
 export default withRouter(App);
