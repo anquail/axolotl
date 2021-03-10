@@ -15,7 +15,8 @@ const App = React.memo(() => {
   };
 
   const handleSetUserInfo = (userInfo) => {
-    setUserInfo((prevUserInfo) => (prevUserInfo = userInfo));
+    // setUserInfo((prevUserInfo) => (prevUserInfo = userInfo));
+    setUserInfo(userInfo);
   };
 
   return (
