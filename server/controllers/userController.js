@@ -14,10 +14,11 @@ userController.checkUser = (req, res, next) => {
 
   db.query(statement, username, (err, result) => {
     if (err) {
+      console.log('check user error obj\n',err)
       return next({
         log: 'There was an error with the checkUser query.',
         message: {
-          err: 'An error occurred with the checkUser query.'
+          err: 'An error occurred with the checkUser query.',
         }
       });
     } else {
@@ -40,11 +41,12 @@ userController.addUser = (req, res, next) => {
   // mock data for now 
   // const userInfo = [`testUser${Math.floor(Math.random() * 100)}`, Math.floor(Math.random() * 100)];
   const userInfo = [req.body.username, req.body.token, JSON.stringify(req.body.githubUserInfo)];
-  console.log(userInfo);
+  console.log('userinforline43', userInfo);
   const statement = `INSERT INTO people (username, token, github_user_info) VALUES($1, $2, $3) RETURNING *`;
   
   db.query(statement, userInfo, (err, result) => {
     if (err) {
+      console.log('check user error obj\n',err);
       return next({
         log: 'There was an error with the addUser query.',
         message: {
@@ -53,6 +55,7 @@ userController.addUser = (req, res, next) => {
       });
     } else {
       // save the newly created user information to res.locals 
+      console.log('newuserline56', result.rows[0]);
       res.locals.user = result.rows[0];
       console.log('User was successfully added to the database. Redirecting to home page.');
       return next();
@@ -72,8 +75,8 @@ userController.checkProfile = (req, res, next) => {
       return next({
         log: 'There was an error with the checkProfile query.',
         message: {
-          err: 'An error occurred with the checkProfile query.'
-        }
+          err: 'An error occurred with the checkProfile query.',
+        },
       });
     } else {
       // if the user doesn't have a profile set up, res.locals.profile will be empty and the user info page will display nothing. otherwise, user info page should display data on res.locals.profile

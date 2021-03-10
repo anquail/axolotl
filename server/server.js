@@ -40,8 +40,8 @@ app.use('/users', dbRouter);
 // authorized routes
 
 //fyi stored in .env locals to keep secret had to install dotenv, and write in gitgnore
-const client_id = process.env.GH_CLIENT_ID
-const client_secret = process.env.GH_CLIENT_SECRET
+const client_id = process.env.GH_CLIENT_ID;
+const client_secret = process.env.GH_CLIENT_SECRET;
 
 
 
