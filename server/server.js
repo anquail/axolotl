@@ -44,8 +44,6 @@ const client_id = process.env.GH_CLIENT_ID;
 const client_secret = process.env.GH_CLIENT_SECRET;
 
 
-
-
 // app.get('/login/home', (req, res) => {
 //   res.status(200).redirect('/login')
 // })
