@@ -6,6 +6,7 @@ const router = express.Router();
 // handles requests to login
 router.post('/login', 
   userController.checkUser,
+  userController.findMatching,
   userController.addUser,
   (req, res) => {
     return res.status(200).json(res.locals.user)//.redirect('/homepage-url');

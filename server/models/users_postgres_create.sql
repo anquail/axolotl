@@ -16,12 +16,11 @@ CREATE TABLE public.people (
   _id serial PRIMARY KEY NOT NULL,
   username varchar NOT NULL,
   token varchar NOT NULL,
-  user_profile JSON,
   matches integer,
-  potential integer,
+  potentials integer,
   interests integer,
-  github_user_info JSON,
-
+  githubavatar varchar,
+  githublink varchar
 );
 
 CREATE TABLE public.matches (
@@ -39,12 +38,14 @@ CREATE TABLE public.potentials (
 CREATE TABLE public.interests (
   _id serial PRIMARY KEY NOT NULL,
   Algo boolean,
+  BackEnd boolean,
   Express boolean,
+  FrontEnd boolean,
   Node boolean,
   NoSQLDB boolean,
   React boolean,
   Redux boolean,
-  SQLDB boolean,
+  SQLDB boolean
 )
 
 ALTER TABLE public.people ADD CONSTRAINT "people_fk0" FOREIGN KEY (matches) REFERENCES public.matches(_id);

@@ -2,6 +2,7 @@
 // middleware that makes queries
 
 const e = require('express');
+const { query } = require('../models/userModels');
 const db = require('../models/userModels');
 
 const userController = {};
@@ -10,11 +11,11 @@ const userController = {};
 // checks the database for the user: TESTED 3/7 5PM
 userController.checkUser = (req, res, next) => {
   const username = [req.body.username]; // save Github username on req.body
-  const statement = `SELECT _id, username, user_profile, github_user_info FROM people WHERE username = $1`
+  const statement = `SELECT * FROM people WHERE username = $1`
 
   db.query(statement, username, (err, result) => {
     if (err) {
-      console.log('check user error obj\n',err)
+      console.log('check user error obj\n', err)
       return next({
         log: 'There was an error with the checkUser query.',
         message: {
@@ -27,26 +28,56 @@ userController.checkUser = (req, res, next) => {
         return next();
       } else { // if the user is in the database, send back user information and rediret to home page
         res.locals.user = result.rows[0];
-        console.log('User exists in the database. Redirecting to home page.');
-        return res.status(200).json(res.locals.user)//.redirect('/homepage-url'); // is this allowed??? reroutes to home page somehow 
+        console.log('imfoundline30', res.locals.user);
+        console.log('User exists in the database. Search for matching.');
+        return next();//.redirect('/homepage-url'); // is this allowed??? reroutes to home page somehow 
       }
     }
   });
 };
 
+userController.findMatching = (req, res, next) => {
+  if (!res.locals.user) return next();
+  const username = [res.locals.user._id]; // save Github username on req.body
+  const statement = `SELECT p.* FROM interests AS i1 INNER JOIN interests AS i2 ON i1.frontend = i2.frontend AND i1.backend = i2.backend INNER JOIN people AS p ON i1._id = p._id WHERE i2._id = $1`
+
+  db.query(statement, username, (err, result) => {
+    if (err) {
+      console.log('check user error obj\n', err)
+      return next({
+        log: 'There was an error with the findMatching query.',
+        message: {
+          err: 'An error occurred with the findMatching query.',
+        }
+      });
+    } else {
+      if (!result.rows.length) { // if the user is not in the database, add them 
+        console.log('User does not have any matching in database.');
+        return res.status(200).json(res.locals.user);
+      } else { // if the user is in the database, send back user information and rediret to home page
+        console.log(result.rows);
+        res.locals.user.matching = result.rows
+        console.log('imfoundline60', res.locals.user);
+        console.log('User exists in the database. Redirecting to home page.');
+        return res.status(200).json(res.locals.user)//.redirect('/homepage-url'); // is this allowed??? reroutes to home page somehow 
+      }
+    }
+  });
+
+}
 // adds user to the database upon first OAuth: TESTED 3/7 5PM
 userController.addUser = (req, res, next) => {
-  
+
   // github username and token should be available on req.body
   // mock data for now 
   // const userInfo = [`testUser${Math.floor(Math.random() * 100)}`, Math.floor(Math.random() * 100)];
-  const userInfo = [req.body.username, req.body.token, JSON.stringify(req.body.githubUserInfo)];
+  const userInfo = [req.body.username, req.body.token, req.body.githubUserInfo.avatar, req.body.githubUserInfo.profileLink];
   console.log('userinforline43', userInfo);
-  const statement = `INSERT INTO people (username, token, github_user_info) VALUES($1, $2, $3) RETURNING *`;
-  
+  const statement = `INSERT INTO people (username, token, githubavatar, githublink) VALUES($1, $2, $3, $4) RETURNING *`;
+
   db.query(statement, userInfo, (err, result) => {
     if (err) {
-      console.log('check user error obj\n',err);
+      console.log('check user error obj\n', err);
       return next({
         log: 'There was an error with the addUser query.',
         message: {
@@ -114,7 +145,7 @@ userController.addProfile = (req, res, next) => {
 userController.getAllUsers = (req, res, next) => {
 
   const statement = `SELECT _id, username, user_profile, github_user_info FROM people`;
-  
+
   db.query(statement, (err, result) => {
     if (err) {
       return next({
@@ -125,7 +156,7 @@ userController.getAllUsers = (req, res, next) => {
       });
     } else {
       if (!result.rows.length) {
-        return res.status(400).json( {err: 'There are no users in the database.'} );
+        return res.status(400).json({ err: 'There are no users in the database.' });
       } else {
         res.locals.allUsers = result.rows;
         console.log('Returning all users to the swipe screen.');
@@ -158,6 +189,14 @@ userController.addPotential = (req, res, next) => {
 
 };
 
+/**
+ * ************************************************************************
+ *
+ * @description NEW MIDDLEWARE FOR FILTERING MATCHES AND FINDING MATCHES
+ *
+ * ************************************************************************
+ */
+
 // returns user's matches. need to be filtered from allUsers on state 
 userController.filterMatches = (req, res, next) => {
 
@@ -174,7 +213,7 @@ userController.filterMatches = (req, res, next) => {
       });
     } else {
       if (!result.rows.length) {
-        return res.status(400).json( {err: 'The query to filter matches returned nothing.'} );
+        return res.status(400).json({ err: 'The query to filter matches returned nothing.' });
       } else {
         res.locals.filteredMatches = result.rows;
         console.log('Returning filtered matches.');
@@ -185,6 +224,23 @@ userController.filterMatches = (req, res, next) => {
 
 };
 
+userController.checkForSwipe = (req, res, next) => {
+  const queryInfo = [];
+  const statement = '';
+
+  db.query(statement, queryInfo, (err, result) => {
+    if (err) {
+      return next({
+        log: 'There was an error with the manageSwipe query',
+        message: {
+          err: 'An error occurred with teh manageSwipe query',
+        }
+      })
+    } else {
+
+    }
+  });
+};
 
 
 module.exports = userController;
