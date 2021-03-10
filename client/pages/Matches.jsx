@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from "react";
 import ProfileCard from "../components/ProfileCard.jsx";
-import { withRouter } from 'react-router-dom';
+import { withRouter } from "react-router-dom";
 import ProfilePicture from "../components/ProfilePicture.jsx";
-import fetch from 'isomorphic-fetch';
+import fetch from "isomorphic-fetch";
 
 ///client/components/ProfilePicture.jsx
 
-
 function Matches(props) {
-  const {user} = props
+  const { user } = props;
   console.log(user._id);
-  if(user.username === undefined) props.history.push('/');
-
-
+  if (user.username === undefined) props.history.push("/");
 
   const [matches, setMatches] = useState([]);
 
@@ -25,7 +22,6 @@ function Matches(props) {
    */
   const fetchMatches = async (userId) => {
     // SAMPLE fetch code for when the matches API is ready
-  
 
     // placeholder code start - replace with fetch to 'matches' API to get match data for logged in user (sample code above)
     const dummyMatches = [];
@@ -40,8 +36,6 @@ function Matches(props) {
       });
     }
 
-
-  
     setMatches(dummyMatches);
     // placeholder code end
   };
@@ -50,46 +44,52 @@ function Matches(props) {
     let matchset = new Set();
     matches.forEach((match, index) => {
       matchset.add(match.potential_matches_username);
-    })
+    });
     const cards = [];
+    let i = 0;
     for (let value of matchset.values()) {
       cards.push(
-        <ProfileCard user={value} className="profile-card"></ProfileCard>
+        <ProfileCard
+          key={`ProfileCard ${i}`}
+          user={value}
+          className="profile-card"
+        />
       );
+      i++;
     }
     return cards;
   };
 
   useEffect(() => {
     //grab info with fetch request
-    fetch('/users/matches', {
+    fetch("/users/matches", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        userId: user._id
+        userId: user._id,
+        //request more info to populate profile cards
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("CLIENT-SIDE FILTERED MATCHES:", data);
+        if (Array.isArray(data)) setMatches(data);
       })
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log('CLIENT-SIDE FILTERED MATCHES:', data);
-      setMatches(data);
-    })
-    .catch(err => {
-      console.log(err, "matche error!");
-    }) 
+      .catch((err) => {
+        console.log(err, "matche error!");
+      });
   }, []);
 
   return (
-  <div className="matches" >
-    <h3>Hello {user.username}</h3>
-    <ProfilePicture image={user.github_user_info.avatar}></ProfilePicture>
-    <h2>Matches</h2>
-    <hr className="rounded" className = "divcolor" ></hr>
-    <div >{generateProfileCards()}</div>
-  </div> 
-   
+    <div className="matches">
+      <h3>Hello {user.username}</h3>
+      <ProfilePicture image={user.github_user_info.avatar} />
+      <h2>Matches</h2>
+      <hr className="rounded" className="divcolor"></hr>
+      <div>{generateProfileCards()}</div>
+    </div>
   );
 }
 
@@ -99,11 +99,6 @@ function Matches(props) {
 // </div> */}
 
 export default withRouter(Matches);
-
-
-
-
-
 
 // const Matches = () => {
 //   return (
