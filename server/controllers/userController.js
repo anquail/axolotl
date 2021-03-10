@@ -29,7 +29,6 @@ userController.checkUser = (req, res, next) => {
         return next();
       } else { // if the user is in the database, send back user information and rediret to home page
         res.locals.user = result.rows[0];
-        console.log('imfoundline30', res.locals.user);
         console.log('User exists in the database. Search for matching.');
         return next();//.redirect('/homepage-url'); // is this allowed??? reroutes to home page somehow 
       }
@@ -71,7 +70,6 @@ userController.addUser = (req, res, next) => {
   // mock data for now 
   // const userInfo = [`testUser${Math.floor(Math.random() * 100)}`, Math.floor(Math.random() * 100)];
   const userInfo = [req.body.username, req.body.token, req.body.githubUserInfo.avatar, req.body.githubUserInfo.profileLink];
-  console.log('userinforline43', userInfo);
   const statement = `INSERT INTO people (username, token, githubavatar, githublink) VALUES($1, $2, $3, $4) RETURNING *`;
 
   db.query(statement, userInfo, (err, result) => {
@@ -85,7 +83,6 @@ userController.addUser = (req, res, next) => {
       });
     } else {
       // save the newly created user information to res.locals 
-      console.log('newuserline56', result.rows[0]);
       res.locals.user = result.rows[0];
       console.log('User was successfully added to the database. Redirecting to home page.');
       return next();
@@ -97,12 +94,10 @@ userController.addUser = (req, res, next) => {
 userController.addInterests = (req, res, next) => {
 
   const defaultInterests = { _id: '', frontEnd: false, backEnd: false };
-  console.log('line99', req.body);
   Object.keys(req.body).forEach((key) => { defaultInterests[key] = req.body[key]; })
-  console.log('line102', defaultInterests);
 
   const userInfo = [defaultInterests._id, defaultInterests.frontEnd, defaultInterests.backEnd];
-  const statement = `INSERT INTO interests (_id, frontend, backend) VALUES($1, $2, $3) RETURNING *`;
+  const statement = `INSERT INTO interests (_id, frontend, backend) VALUES($1, $2, $3) ON CONFLICT (_id) DO UPDATE SET frontend = EXCLUDED.frontend, backend = EXCLUDED.backend RETURNING *`;
 
   db.query(statement, userInfo, (err, result) => {
     if (err) {
@@ -114,10 +109,8 @@ userController.addInterests = (req, res, next) => {
         }
       });
     } else {
-      console.log('line117', req.body);
       console.log('Interests was successfully added to the database. Redirecting to home page.');
       res.locals.user = req.body
-      console.log('res.locals.user120', res.locals.user);
       return next();
     }
   });
@@ -360,6 +353,26 @@ userController.updateMatches = (req, res, next) => {
   };
 
 
+};
+
+userController.returnMatches = (req, res, next) => {
+  const queryInfo = [req.body.userId];
+  const statement = `SELECT target_id, people.* FROM matches LEFT JOIN people ON people._id = matches.target_id WHERE match_status = TRUE AND user_id = $1;`;
+
+  db.query(statement, queryInfo, (err, result) => {
+    if (err) {
+      return next({
+        log: 'There was an error with the returnMatches query\n' + err,
+        message: {
+          err: 'An error occurred with the returnMatches query',
+        }
+      })
+    } else {
+      console.log('returnMatches result.rows\n', result.rows)
+      res.locals.matches = result.rows;
+      return next();
+    };
+  });
 };
 
 module.exports = userController;
