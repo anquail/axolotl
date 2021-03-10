@@ -3,25 +3,12 @@ import { withRouter, useLocation, useHistory } from "react-router-dom";
 import fetch from "isomorphic-fetch";
 import regeneratorRuntime from "regenerator-runtime";
 
-const handleOAuth = async () => {
-  try {
-    const oAuthUrl = await fetch("/login", {
-      mode: "no-cors",
-    });
-    const url = await oAuthUrl.json();
-
-    window.location.href = await url;
-  } catch (err) {
-    console.log(err);
-  }
-};
-
 const Login = React.memo((props) => {
   const { handleSetUser, handleSetUserInfo } = props;
   let token = "";
   const { search } = useLocation();
   const code = search;
-  console.log("search is", search);
+  console.log("search is", search); // ?code=61980dffecf487007875
 
   const getToken = async (code) => {
     try {
@@ -63,7 +50,7 @@ const Login = React.memo((props) => {
 
       props.history.push("/home");
     } catch (err) {
-      console.log(err);
+      console.log("COOKIE ERR", err);
     }
   };
 
@@ -79,10 +66,12 @@ const Login = React.memo((props) => {
         <h2>Welcome</h2>
         <p>dotConnect()</p>
         <div className="loginButtonContainer">
-          <button onClick={handleOAuth}>
-            <i className="fab fa-github-square fa-2x"></i>
-            LOGIN WITH GITHUB
-          </button>
+          <a href="https://github.com/login/oauth/authorize?client_id=8990a039ea7d2619e624">
+            <button>
+              <i className="fab fa-github-square fa-2x"></i>
+              LOGIN WITH GITHUB
+            </button>
+          </a>
         </div>
       </div>
     </div>

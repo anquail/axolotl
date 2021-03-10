@@ -1,20 +1,21 @@
-
 /**
  * ************************************************************************
  *
- * @description IMPORTS AND SERVER SETUP 
+ * @description IMPORTS AND SERVER SETUP
  *
  * ************************************************************************
  */
 
 const express = require("express");
 const path = require("path");
-const fetch = require('node-fetch');  // allows requests to be made in dev mode
-const cors = require('cors');
-const cookieParser = require('cookie-parser');
+const fetch = require("node-fetch"); // allows requests to be made in dev mode
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
 require("dotenv").config();
 
-const dbRouter = require('./routes/databaseRoutes');
+const dbRouter = require("./routes/databaseRoutes");
+const authController = require("./controllers/authController");
+const userController = require("./controllers/userController");
 
 const app = express();
 const PORT = 3000;
@@ -33,7 +34,7 @@ app.use(express.urlencoded());
  * ************************************************************************
  */
 
-app.use('/users', dbRouter);
+app.use("/users", dbRouter);
 
 // OAUTH LOGIN REQUEST
 
@@ -43,72 +44,31 @@ app.use('/users', dbRouter);
 const client_id = process.env.GH_CLIENT_ID;
 const client_secret = process.env.GH_CLIENT_SECRET;
 
-
-
-
 // app.get('/login/home', (req, res) => {
 //   res.status(200).redirect('/login')
 // })
 
 //redirect to request Github acess this should probably be on client side
-app.get("/login", (req,res)=>{
-  const url =`https://github.com/login/oauth/authorize?client_id=${client_id}`
-  res.cookie('logging_in');
-  res.status(200).json(url);
-})
-
-
-
-// //where github autoredirects giving us code
-app.get('/login/home', (req,res)=>{
-  const body ={
-    client_id:client_id,
-    client_secret:client_secret,
-    code: req.query.code
+app.get(
+  "/login/auth",
+  authController.getToken,
+  authController.getUserFromGH,
+  userController.checkUser,
+  userController.addUser,
+  authController.addJWT,
+  (req, res) => {
+    res.status(200).json(res.locals.user);
   }
- 
-console.log('CODE: ', req.query.code)
-  //  getAccessToken(code)or
-fetch('https://github.com/login/oauth/access_token',{
-    method:"POST",
-    headers:{
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      client_id: client_id,
-      client_secret: client_secret,
-      code: req.query.code
-    })
-  }).then(response => response.text())
-    .then(data => new URLSearchParams(data))
-    .then(params => {
-      console.log('ACCESS_TOKEN: ', params.get('access_token'));
-      return res.status(200).json(params.get('access_token'));
-    })
-    // res.redirect('/home');
-    
-})
+);
 
-
-
-
-
-
-//   if(!code){
-//     return res.send({
-//       message:"please try again"
-//     })
-//   }
-//   console.log("login redirect?????")
-//   req.post(  )
-//   .send({
-
-//   })
-// }
-
-//https://github.com/settings/connections/applications/:client_id
-//client ID 5c3312c7f96f4983b9c7
-
+app.get(
+  "/currentUser",
+  authController.verifyJWT,
+  userController.checkUser,
+  (req, res) => {
+    res.status(200).json(res.locals.user);
+  }
+);
 
 /**
  * ************************************************************************
@@ -126,17 +86,17 @@ app.get("/", (req, res) => {
 });
 
 // catch-all route handler for requests to unknown routes
-app.use((req, res) => res.status(404).send('This page does not exist.'))
+app.use((req, res) => res.status(404).send("This page does not exist."));
 
 // global error handler
 app.use((err, req, res, next) => {
   const defaultErr = {
-    log: 'Express error handler caught unknown error',
+    log: "Express error handler caught unknown error",
     status: 500,
-    message: { err: 'An error occurred' },
-  }
+    message: { err: "An error occurred" },
+  };
   const errorObj = Object.assign({}, defaultErr, err);
-  console.log('Error message: ', errorObj.log);
+  console.log("Error message: ", errorObj.log);
   return res.status(errorObj.status).json(errorObj.message);
 });
 
@@ -144,6 +104,5 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}...`);
 });
-
 
 module.export = app;

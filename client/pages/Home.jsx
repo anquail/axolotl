@@ -59,6 +59,7 @@ const Home = (props) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          // PASS ONLY USER ID IN REQ BODY
           userId: user._id,
           username: user.username,
           potentialMatchId: potentialMatches.currPotMatch._id,
