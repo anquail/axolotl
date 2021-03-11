@@ -83,4 +83,12 @@ router.post('/swipe',
   }
 );
 
+router.post('/deletematch',
+  userController.removeMatch,
+  (req,res) => {
+    console.log('removed match');
+    return res.status(200).json();
+  }
+);
+
 module.exports = router;
