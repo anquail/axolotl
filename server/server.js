@@ -69,7 +69,6 @@ app.get(
   userController.findInterests,
   // getuser from database and store in res.locals
   (req, res) => {
-    console.log("here is res.locals.user before sent!!!", res.locals.user);
     return res.status(200).json(res.locals.user);
   }
 );

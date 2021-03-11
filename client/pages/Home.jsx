@@ -5,6 +5,8 @@ import fetch from "isomorphic-fetch";
 
 const Home = ({ user, setUser }) => {
   const [loggingIn, setLoggingIn] = useState(false);
+  const [interests, setInterests] = useState([]);
+  const [interestIdx, setInterestIdx] = useState(0);
 
   useEffect(() => {
     if (!Object.keys(user).length) {
@@ -15,87 +17,35 @@ const Home = ({ user, setUser }) => {
           console.log("data from fetch /currentUser is", data);
           setUser(data);
           setLoggingIn(false);
-          // props.history.push("/home");
+          setInterests(data.interests);
         })
         .catch((error) => console.log("error in fetch /currentUser", error));
     }
   }, []);
 
-  const [potentialMatches, setPotentialMatches] = useState({});
-  const [loaded, setLoaded] = useState(false);
-  const [moreMatches, setMoreMatches] = useState(true);
-
-  async function getData() {
-    try {
-      const allUsers = await fetch("/users/users");
-      const allUsersJson = await allUsers.json();
-      console.log("LINE 56: ", await allUsersJson);
-      const currPotMatch = allUsersJson.shift(); //can randomize to pick user
-      setPotentialMatches({
-        allPotMatches: allUsersJson,
-        currPotMatch: currPotMatch,
-        // loaded: true,
-      });
-      setLoaded(true);
-      setMoreMatches(true);
-    } catch (err) {
-      console.log(err);
-    }
-  }
-  useEffect(() => {
-    getData();
-  }, []);
-
   const handleSwipe = (e, decision) => {
-    //decision will be a string, 'reject' or 'accept' will matter when we have data, doesnt for now
-
     if (decision === "accept") {
-      const newCurrMatch = potentialMatches.allPotMatches.shift();
-      if (!newCurrMatch) {
-        console.log("NO MORE MATCHES");
-        setMoreMatches(false);
-      } else {
-        setPotentialMatches({
-          ...potentialMatches,
-          currPotMatch: newCurrMatch,
-        });
-      }
-      fetch("/users/potential-matches", {
+      fetch("/users/swipe", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          // PASS ONLY USER ID IN REQ BODY
           userId: user._id,
-          username: user.username,
-          potentialMatchId: potentialMatches.currPotMatch._id,
-          potentialMatchUsername: potentialMatches.currPotMatch.username,
+          targetId: interests[interestIdx]._id,
         }),
       });
-    } else {
-      const newCurrMatch = potentialMatches.allPotMatches.shift();
-      if (!newCurrMatch) {
-        console.log("NO MORE MATCHES");
-        setMoreMatches(false);
-      } else {
-        setPotentialMatches({
-          ...potentialMatches,
-          currPotMatch: newCurrMatch,
-        });
-      }
     }
+    setInterestIdx(interestIdx + 1);
   };
 
-  if (Object.keys(user).length && moreMatches) {
+  if (Object.keys(user).length && interests[interestIdx]) {
     return (
       <div className="mainContainer">
-        {loaded ? (
-          <UserCard
-            currPotMatch={potentialMatches.currPotMatch}
-            handleSwipe={handleSwipe}
-          />
-        ) : null}
+        <UserCard
+          curInterest={interests[interestIdx]}
+          handleSwipe={handleSwipe}
+        />
       </div>
     );
   } else if (loggingIn) {
@@ -106,7 +56,7 @@ const Home = ({ user, setUser }) => {
     return (
       <div>
         <h1>OUT OF MATCHES</h1>
-        <button onClick={getData}>Refresh Matches</button>
+        <button onClick={() => setInterestIdx(0)}>Refresh Matches</button>
       </div>
     );
   }
