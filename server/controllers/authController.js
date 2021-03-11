@@ -50,7 +50,7 @@ authController.addJWT = (req, res, next) => {
     { login, id },
     jwtSecret,
     {
-      expiresIn: "1h",
+      expiresIn: "24h",
     },
     (err, token) => {
       if (err) {
@@ -74,7 +74,7 @@ authController.verifyJWT = (req, res, next) => {
 
   // Verify Token
   jwt.verify(token, jwtSecret, (err, decoded) => {
-    if (!decoded) return res.json();
+    if (!decoded) return res.json(false);
     const { login, id } = decoded;
     res.locals.jwtInfo = { login, id };
 

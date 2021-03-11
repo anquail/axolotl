@@ -5,7 +5,7 @@ const userController = {};
 // checks the database for the user: TESTED 3/7 5PM
 userController.checkUser = (req, res, next) => {
   const username = res.locals.jwtInfo.login; // save Github username on req.body
-  const statement = `SELECT * FROM people WHERE username = $1`;
+  const statement = `SELECT p.*, i.frontend, i.backend FROM people AS p INNER JOIN interests AS i ON i._id = p._id WHERE username = $1`;
 
   db.query(statement, [username], (err, result) => {
     if (err) {
@@ -98,13 +98,13 @@ userController.addUser = (req, res, next) => {
 userController.getCurUser = (req, res, next) => {
   if (!res.locals.jwtInfo) return res.json(false);
   const username = res.locals.jwtInfo.login;
-  const statement = `SELECT * FROM people WHERE username = $1`;
+  const statement = `SELECT p.*, i.frontend, i.backend FROM people AS p INNER JOIN interests AS i ON i._id = p._id WHERE username = $1`;
   db.query(statement, [username], (err, result) => {
     if (err)
       return next({
         log: "There was an error with the getCurUser query.",
         message: {
-          err: "An error occurred with the getCurUSer query.",
+          err: "An error occurred with the getCurUser query.",
         },
       });
     res.locals.user = result.rows[0];
@@ -415,7 +415,7 @@ userController.getAllPotentials = (req, res, next) => {
     req.body.interest_frontEnd,
     req.body.interest_backend,
   ];
-  const statement = `SELECT * FROM people ppl LEFT JOIN interests i ON i._id = ppl._id WHERE ppl._id <> $1 AND ppl._id NOT IN (SELECT target_ID FROM matches WHERE user_id = 1) AND i.frontend = $2 AND i.backend = $3;`;
+  const statement = `SELECT * FROM people ppl LEFT JOIN interests i ON i._id = ppl._id WHERE ppl._id <> $1 AND ppl._id NOT IN (SELECT target_ID FROM matches WHERE user_id = $1) AND i.frontend = $2 AND i.backend = $3;`;
 
   db.query(statement, queryInfo, (err, result) => {
     if (err) {

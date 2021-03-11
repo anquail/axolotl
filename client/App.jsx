@@ -19,7 +19,6 @@ const App = React.memo(({ history }) => {
       fetch("/api/currentUser")
         .then((res) => res.json())
         .then((data) => {
-          console.log(data);
           if (data === false) return history.push("/login");
           else {
             setUser(data);
