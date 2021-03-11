@@ -6,11 +6,16 @@ const router = express.Router();
 // handles requests to login
 router.post('/login', 
   userController.checkUser,
+  userController.findInterests,
   userController.addUser,
   (req, res) => {
     return res.status(200).json(res.locals.user)//.redirect('/homepage-url');
   }
 );
+
+router.post('/interests', userController.addInterests, userController.findInterests, (req, res) => {
+  return res.status(200).json(res.locals.user)
+})
 
 // handles get requests for user profile
 router.post('/profile', 
@@ -50,10 +55,35 @@ router.post('/matches',
     console.log(req.body)
     return next();
   },
-  userController.filterMatches,
+  userController.returnMatches,
+  // userController.filterMatches, // do not use this middleware anymore
   (req, res) => {
-    console.log('SERVER-SIDE FILTERED MATCHES:', res.locals.filteredMatches);
-    return res.status(200).json(res.locals.filteredMatches);
+    console.log('SERVER-SIDE MATCHES:', res.locals.matches);
+    return res.status(200).json(res.locals.matches);
+  }
+);
+
+// // original code to handle matches
+// router.post('/matches', 
+//   (req, res, next) => {
+//     console.log(req.body)
+//     return next();
+//   },
+//   userController.filterMatches,
+//   (req, res) => {
+//     console.log('SERVER-SIDE FILTERED MATCHES:', res.locals.filteredMatches);
+//     return res.status(200).json(res.locals.filteredMatches);
+//   }
+// );
+
+router.post('/swipe',
+  userController.checkForSwipe,
+  userController.updateSwipes,
+  userController.checkIfMatchMade,
+  userController.updateMatches,
+  (req, res) => {
+    console.log('completed swipe updates');
+    return res.status(200).json(res.locals.matches);
   }
 );
 

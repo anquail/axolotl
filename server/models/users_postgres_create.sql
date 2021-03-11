@@ -16,18 +16,27 @@ CREATE TABLE public.people (
   _id serial PRIMARY KEY NOT NULL,
   username varchar NOT NULL,
   token varchar NOT NULL,
-  user_profile JSON,
   matches integer,
-  potential integer,
+  potentials integer,
   interests integer,
-  github_user_info JSON,
-
+  githubavatar varchar,
+  githublink varchar
 );
 
+-- CREATE TABLE public.matches (
+--   _id serial PRIMARY KEY NOT NULL,
+--   match integer
+-- );
+
+-- swipes and matches table
 CREATE TABLE public.matches (
   _id serial PRIMARY KEY NOT NULL,
-  match integer
+  user_id integer NOT NULL,
+  target_id integer NOT NULL,
+  swipe boolean,
+  match_status boolean
 );
+-- TO-DO: May need to map foreign key from people to swipes
 
 CREATE TABLE public.potentials (
   _id integer,
@@ -39,15 +48,28 @@ CREATE TABLE public.potentials (
 CREATE TABLE public.interests (
   _id serial PRIMARY KEY NOT NULL,
   Algo boolean,
+  BackEnd boolean,
   Express boolean,
+  FrontEnd boolean,
   Node boolean,
   NoSQLDB boolean,
   React boolean,
   Redux boolean,
-  SQLDB boolean,
-)
+  SQLDB boolean
+);
+
 
 ALTER TABLE public.people ADD CONSTRAINT "people_fk0" FOREIGN KEY (matches) REFERENCES public.matches(_id);
-ALTER TABLE public.people ADD CONSTRAINT "people_fk1" FOREIGN KEY (potential) REFERENCES public.potentials(_id);
+ALTER TABLE public.people ADD CONSTRAINT "people_fk1" FOREIGN KEY (potentials) REFERENCES public.potentials(_id);
 ALTER TABLE public.people ADD CONSTRAINT "people_fk2" FOREIGN KEY (interests) REFERENCES public.interests(_id);
 
+
+-- swipes and matches table
+CREATE TABLE public.matches (
+  _id serial PRIMARY KEY NOT NULL,
+  user_id integer NOT NULL,
+  target_id integer NOT NULL,
+  swipe boolean,
+  match boolean
+);
+-- TO-DO: May need to map foreign key from people to swipes

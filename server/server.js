@@ -7,12 +7,12 @@
  * ************************************************************************
  */
 
-const express = require("express");
-const path = require("path");
-const fetch = require('node-fetch');  // allows requests to be made in dev mode
+const express = require('express');
+const path = require('path');
+const fetch = require('node-fetch'); // allows requests to be made in dev mode
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-require("dotenv").config();
+require('dotenv').config();
 
 const dbRouter = require('./routes/databaseRoutes');
 
@@ -44,15 +44,13 @@ const client_id = process.env.GH_CLIENT_ID;
 const client_secret = process.env.GH_CLIENT_SECRET;
 
 
-
-
 // app.get('/login/home', (req, res) => {
 //   res.status(200).redirect('/login')
 // })
 
 //redirect to request Github acess this should probably be on client side
-app.get("/login", (req,res)=>{
-  const url =`https://github.com/login/oauth/authorize?client_id=${client_id}`
+app.get("/login", (req, res) => {
+  const url = `https://github.com/login/oauth/authorize?client_id=${client_id}`
   res.cookie('logging_in');
   res.status(200).json(url);
 })
@@ -60,18 +58,18 @@ app.get("/login", (req,res)=>{
 
 
 // //where github autoredirects giving us code
-app.get('/login/home', (req,res)=>{
-  const body ={
-    client_id:client_id,
-    client_secret:client_secret,
+app.get('/login/home', (req, res) => {
+  const body = {
+    client_id: client_id,
+    client_secret: client_secret,
     code: req.query.code
   }
- 
-console.log('CODE: ', req.query.code)
+
+  console.log('CODE: ', req.query.code)
   //  getAccessToken(code)or
-fetch('https://github.com/login/oauth/access_token',{
-    method:"POST",
-    headers:{
+  fetch('https://github.com/login/oauth/access_token', {
+    method: "POST",
+    headers: {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
@@ -85,9 +83,9 @@ fetch('https://github.com/login/oauth/access_token',{
       console.log('ACCESS_TOKEN: ', params.get('access_token'));
       return res.status(200).json(params.get('access_token'));
     })
-    // res.redirect('/home');
-    
-})
+  // res.redirect('/home');
+
+});
 
 
 
