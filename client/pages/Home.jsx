@@ -4,15 +4,22 @@ import UserCard from "../components/UserCard.jsx";
 import fetch from "isomorphic-fetch";
 import regeneratorRuntime from "regenerator-runtime";
 
-//Functional Component
-const Home = (props) => {
-  const { user } = props;
-
+const Home = ({ user, setUser }) => {
+  const [loggingIn, setLogginIn] = useState(false);
   useEffect(() => {
-    if (user.username === undefined) props.history.push("/");
-  }, [user]);
-
-  // if (user.username === undefined) props.history.push("/");
+    if (!Object.keys(user).length) {
+      setLogginIn(true);
+      fetch("/api/currentUser")
+        .then((res) => res.json())
+        .then((data) => {
+          console.log("data from fetch /currentUser is", data);
+          setUser(data);
+          setLoggingIn(false);
+          // props.history.push("/home");
+        })
+        .catch((error) => console.log("error in fetch /currentUser", error));
+    }
+  }, []);
 
   const [potentialMatches, setPotentialMatches] = useState({});
   const [loaded, setLoaded] = useState(false);
@@ -80,7 +87,7 @@ const Home = (props) => {
     }
   };
 
-  if (moreMatches) {
+  if (Object.keys(user).length && moreMatches) {
     return (
       <div className="mainContainer">
         {loaded ? (
@@ -91,6 +98,10 @@ const Home = (props) => {
         ) : null}
       </div>
     );
+  } else if (loggingIn) {
+    return <h1>Loading...</h1>;
+  } else if (!Object.keys(user).length) {
+    return <h1>YOU NEED TO LOG IN</h1>;
   } else {
     return (
       <div>

@@ -14,6 +14,8 @@ module.exports = () => {
       historyApiFallback: true,
       contentBase: "./client",
       proxy: {
+        "/home": "http://localhost:3000",
+        "/api/currentUser": "http://localhost:3000",
         "/login": "http://localhost:3000",
         "/login/home": "http://localhost:3000",
         "/users/login": "http://localhost:3000",

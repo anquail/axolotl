@@ -7,9 +7,9 @@ const userController = {};
 
 // checks the database for the user: TESTED 3/7 5PM
 userController.checkUser = (req, res, next) => {
-  const username = res.locals.user.login; // save Github username on req.body
-  const statement = `SELECT _id, username, user_profile, github_user_info FROM people WHERE username = $1`;
-
+  const username = res.locals.jwtInfo.login; // save Github username on req.body
+  const statement = `SELECT * FROM people WHERE username = $1`;
+  console.log("inside usercontroller check user");
   db.query(statement, [username], (err, result) => {
     if (err) {
       console.log("check user error obj\n", err);
@@ -30,7 +30,8 @@ userController.checkUser = (req, res, next) => {
         // if the user is in the database, send back user information and rediret to home page
         res.locals.user = result.rows[0];
         console.log("User exists in the database. Redirecting to home page.");
-        return res.status(200).json(res.locals.user); //.redirect('/homepage-url'); // is this allowed??? reroutes to home page somehow
+        return res.redirect("http://localhost:8080/home");
+        // return res.redirect("http://localhost:8080"); //.redirect('/homepage-url'); // is this allowed??? reroutes to home page somehow
       }
     }
   });
@@ -38,16 +39,24 @@ userController.checkUser = (req, res, next) => {
 
 // adds user to the database upon first OAuth: TESTED 3/7 5PM
 userController.addUser = (req, res, next) => {
+  console.log("inside usercontroller add user");
+
   // github username and token should be available on req.body
   // mock data for now
   // const userInfo = [`testUser${Math.floor(Math.random() * 100)}`, Math.floor(Math.random() * 100)];
+  console.log(res.locals.user);
   const userInfo = [
-    res.locals.user.login,
+    res.locals.jwtInfo.login,
     res.locals.token,
-    JSON.stringify(res.locals.user),
+    // github avatar url
+    res.locals.user.avatar_url,
+    // req.body.githubUserInfo.profileLink
+    res.locals.user.url,
   ];
   console.log("userinforline43", userInfo);
-  const statement = `INSERT INTO people (username, token, github_user_info) VALUES($1, $2, $3) RETURNING *`;
+  // const statement = `INSERT INTO people (username, token, github_user_info) VALUES($1, $2, $3) RETURNING *`;
+  // const userInfo = [req.body.username, req.body.token, req.body.githubUserInfo.avatar, req.body.githubUserInfo.profileLink]
+  const statement = `INSERT INTO people (username, token, githubavatar, githublink) VALUES($1, $2, $3, $4) RETURNING *`;
 
   db.query(statement, userInfo, (err, result) => {
     if (err) {
@@ -67,6 +76,23 @@ userController.addUser = (req, res, next) => {
       );
       return next();
     }
+  });
+};
+
+userController.getCurUser = (req, res, next) => {
+  console.log(res.locals);
+  const username = res.locals.jwtInfo.login;
+  const statement = `SELECT * FROM people WHERE username = $1`;
+  db.query(statement, [username], (err, result) => {
+    if (err)
+      return next({
+        log: "There was an error with the getCurUser query.",
+        message: {
+          err: "An error occurred with the getCurUSer query.",
+        },
+      });
+    res.locals.user = result.rows[0];
+    return next();
   });
 };
 
@@ -116,7 +142,7 @@ userController.addProfile = (req, res, next) => {
 
 // gets all users to display on swipe screen: TESTED 3/7 5:30PM
 userController.getAllUsers = (req, res, next) => {
-  const statement = `SELECT _id, username, user_profile, github_user_info FROM people`;
+  const statement = `SELECT * FROM people`;
 
   db.query(statement, (err, result) => {
     if (err) {

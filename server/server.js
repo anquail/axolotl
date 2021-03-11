@@ -53,20 +53,22 @@ app.get(
   "/login/auth",
   authController.getToken,
   authController.getUserFromGH,
+  authController.addJWT,
   userController.checkUser,
   userController.addUser,
-  authController.addJWT,
   (req, res) => {
-    res.status(200).json(res.locals.user);
+    return res.redirect("http://localhost:8080/home");
   }
 );
 
 app.get(
-  "/currentUser",
+  "/api/currentUser",
   authController.verifyJWT,
-  userController.checkUser,
+  userController.getCurUser,
+  // getuser from database and store in res.locals
   (req, res) => {
-    res.status(200).json(res.locals.user);
+    console.log("here is res.locals.user before sent!!!", res.locals.user);
+    return res.status(200).json(res.locals.user);
   }
 );
 
@@ -82,6 +84,10 @@ app.use("/build", express.static(path.join(__dirname, "../build")));
 
 // serves index.html
 app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../client/index.html"));
+});
+
+app.get("/home", (req, res) => {
   res.sendFile(path.join(__dirname, "../client/index.html"));
 });
 

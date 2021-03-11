@@ -5,26 +5,17 @@ import NavBar from "./components/NavBar.jsx";
 import Home from "./pages/Home.jsx";
 import Profile from "./pages/Profile.jsx";
 import Matches from "./pages/Matches.jsx";
+import fetch from "node-fetch";
 
-const App = React.memo(() => {
+const App = React.memo((props) => {
   const [user, setUser] = useState({});
-
-  const handleSetUser = (userObj) => {
-    //setUser((prevUsername) => (prevUsername = username));
-    setUser(userObj);
-  };
-
-  const handleSetUserInfo = (userInfo) => {
-    // setUserInfo((prevUserInfo) => (prevUserInfo = userInfo));
-    setUserInfo(userInfo);
-  };
 
   return (
     <div className="mainContainer">
       <Switch>
-        <Route path="/home">
+        <Route exact path="/home">
           <NavBar />
-          <Home user={user} />
+          <Home user={user} setUser={setUser} />
         </Route>
         <Route path="/profile">
           <NavBar />
@@ -35,34 +26,11 @@ const App = React.memo(() => {
           <Matches user={user} />
         </Route>
         <Route path="/">
-          <Login
-            handleSetUser={handleSetUser}
-            user={user}
-            handleSetUserInfo={handleSetUserInfo}
-          />
+          <Login user={user} />
         </Route>
       </Switch>
     </div>
   );
 });
-
-// function Home() {
-//   return <h2>Home</h2>;
-// }
-// function Profile() {
-//   return <h2>Profile</h2>;
-// }
-// function Matches() {
-//   return <h2>Matches</h2>
-// }
-// function UserName() {
-//   return(<h1> User’s Name </h1>);
-// }
-// inline styles
-// styles for profile
-
-const profileStyles = {
-  padding: "5px 20px",
-};
 
 export default withRouter(App);

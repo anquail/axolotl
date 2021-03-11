@@ -85,7 +85,7 @@ function Matches(props) {
   return (
     <div className="matches">
       <h3>Hello {user.username}</h3>
-      <ProfilePicture image={user.github_user_info.avatar} />
+      <ProfilePicture image={user.githubavatar} />
       <h2>Matches</h2>
       <hr className="rounded" className="divcolor"></hr>
       <div>{generateProfileCards()}</div>

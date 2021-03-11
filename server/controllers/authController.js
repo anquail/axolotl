@@ -8,7 +8,7 @@ const jwtSecret = "super-secret-secret";
 const authController = {};
 
 authController.getToken = (req, res, next) => {
-  console.log(req.query);
+  console.log("inside getToken");
   axios
     .post("https://github.com/login/oauth/access_token", {
       client_id: client_id,
@@ -34,6 +34,8 @@ authController.getToken = (req, res, next) => {
 };
 
 authController.getUserFromGH = (req, res, next) => {
+  console.log("inside getUserFromGH");
+
   fetch(`https://api.github.com/user`, {
     headers: {
       Authorization: `token ${res.locals.token}`,
@@ -53,6 +55,9 @@ authController.getUserFromGH = (req, res, next) => {
 };
 
 authController.addJWT = (req, res, next) => {
+  console.log("inside addJWT");
+  console.log(res.locals.user);
+
   const { login, id } = res.locals.user;
 
   jwt.sign(
@@ -66,6 +71,8 @@ authController.addJWT = (req, res, next) => {
         return res.status(400).json("error creating jwt");
       }
       res.cookie("jwt", token, { httpOnly: true });
+      console.log("inside addJWT next");
+      res.locals.jwtInfo = { login, id };
       return next();
     }
   );
@@ -73,6 +80,8 @@ authController.addJWT = (req, res, next) => {
 
 authController.verifyJWT = (req, res, next) => {
   const token = req.cookies.jwt;
+  console.log("verify JWT");
+  console.log(token);
   if (!token) {
     return res.json();
   }
