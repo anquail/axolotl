@@ -85,9 +85,10 @@ router.post('/swipe',
 
 router.post('/deletematch',
   userController.removeMatch,
+  userController.returnMatches,
   (req,res) => {
     console.log('removed match');
-    return res.status(200).json();
+    return res.status(200).json(res.locals.matches);
   }
 );
 
