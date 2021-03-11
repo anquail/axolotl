@@ -98,7 +98,7 @@ userController.addUser = (req, res, next) => {
 userController.getCurUser = (req, res, next) => {
   if (!res.locals.jwtInfo) return res.json(false);
   const username = res.locals.jwtInfo.login;
-  const statement = `SELECT p.*, i.frontend, i.backend FROM people AS p INNER JOIN interests AS i ON i._id = p._id WHERE username = $1`;
+  const statement = `SELECT p.*, i.frontend, i.backend FROM people AS p LEFT JOIN interests AS i ON i._id = p._id WHERE username = $1`;
   db.query(statement, [username], (err, result) => {
     if (err)
       return next({
@@ -427,6 +427,30 @@ userController.getAllPotentials = (req, res, next) => {
       });
     } else {
       console.log("getAllPotentials result.rows\n", result.rows);
+      res.locals.potentials = result.rows;
+      return next();
+    }
+  });
+};
+
+
+userController.removeMatch = (req, res, next) => {
+  const queryInfo = [
+    req.body.userId, 
+    req.body.targetId
+  ];
+  const statement = `DELETE FROM matches WHERE (user_id = $1 AND target_id = $2) OR (user_id = $2 AND target_id = $1);`;
+
+  db.query(statement, queryInfo, (err, result) => {
+    if (err) {
+      return next({
+        log: "There was an error with the removeMatch query\n" + err,
+        message: {
+          err: "An error occurred with the removeMatch query",
+        },
+      });
+    } else {
+      console.log("removeMatch result.rows\n", result.rows);
       res.locals.potentials = result.rows;
       return next();
     }
