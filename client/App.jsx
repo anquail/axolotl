@@ -19,7 +19,7 @@ const App = React.memo((props) => {
         </Route>
         <Route path="/profile">
           <NavBar />
-          <Profile user={user} />
+          <Profile user={user} setUser={setUser} />
         </Route>
         <Route path="/matches">
           <NavBar />

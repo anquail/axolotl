@@ -1,22 +1,16 @@
 import React from "react";
 //import "./ProfileCard.css";
 
-const ProfileCard = ({ user, className }) => {
-  console.log("className", className);
+const ProfileCard = ({ match }) => {
+  const { githubavatar, interests, username } = match;
   return (
-    <React.Fragment>
-      <div className={`${className} profile-card-container`}>
-        <img
-          className="profile-card-pic"
-          src={`https://github.com/${user}.png`}
-          alt="profile pic"
-        ></img>
-        <div className="profile-card-copy">
-          <h3>{user}</h3>
-          <p>{"some description"}</p>
-        </div>
+    <div className="profile-card profile-card-container">
+      <img className="profile-card-pic" src={githubavatar} alt="profile pic" />
+      <div className="profile-card-copy">
+        <h3>{username}</h3>
+        <p>{interests}</p>
       </div>
-    </React.Fragment>
+    </div>
   );
 };
 
