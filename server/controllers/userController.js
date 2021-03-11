@@ -1,18 +1,22 @@
 // middleware that makes queries
 
-const e = require("express");
-const db = require("../models/userModels");
+
+const e = require('express');
+const { query } = require('../models/userModels');
+const db = require('../models/userModels');
 
 const userController = {};
 
 // checks the database for the user: TESTED 3/7 5PM
 userController.checkUser = (req, res, next) => {
+
   const username = res.locals.jwtInfo.login; // save Github username on req.body
   const statement = `SELECT * FROM people WHERE username = $1`;
   console.log("inside usercontroller check user");
   db.query(statement, [username], (err, result) => {
     if (err) {
       console.log("check user error obj\n", err);
+
       return next({
         log: "There was an error with the checkUser query.",
         message: {
@@ -32,18 +36,45 @@ userController.checkUser = (req, res, next) => {
         console.log("User exists in the database. Redirecting to home page.");
         return res.redirect("http://localhost:8080/home");
         // return res.redirect("http://localhost:8080"); //.redirect('/homepage-url'); // is this allowed??? reroutes to home page somehow
+
       }
     }
   });
 };
 
+userController.findInterests = (req, res, next) => {
+  if (!res.locals.user) return next();
+  const username = [res.locals.user._id]; // save Github username on req.body
+  const statement = `SELECT p.*, i1.frontend, i1.backend FROM interests AS i1 INNER JOIN interests AS i2 ON i1.frontend = i2.frontend OR i1.backend = i2.backend INNER JOIN people AS p ON i1._id = p._id WHERE i2._id = $1`
+
+  db.query(statement, username, (err, result) => {
+    if (err) {
+      console.log('check user error obj\n', err)
+      return next({
+        log: 'There was an error with the findInterests query.',
+        message: {
+          err: 'An error occurred with the findInterests query.',
+        }
+      });
+    } else {
+      if (!result.rows.length) {
+        console.log('User does not have any matching in database.');
+        return res.status(200).json(res.locals.user);
+      } else {
+        res.locals.user.interests = result.rows
+        console.log('User exists in the database. Redirecting to home page.');
+        return res.status(200).json(res.locals.user)
+      }
+    }
+  });
+
+}
 // adds user to the database upon first OAuth: TESTED 3/7 5PM
 userController.addUser = (req, res, next) => {
-  console.log("inside usercontroller add user");
-
   // github username and token should be available on req.body
   // mock data for now
   // const userInfo = [`testUser${Math.floor(Math.random() * 100)}`, Math.floor(Math.random() * 100)];
+
   console.log(res.locals.user);
   const userInfo = [
     res.locals.jwtInfo.login,
@@ -56,6 +87,9 @@ userController.addUser = (req, res, next) => {
   console.log("userinforline43", userInfo);
   // const statement = `INSERT INTO people (username, token, github_user_info) VALUES($1, $2, $3) RETURNING *`;
   // const userInfo = [req.body.username, req.body.token, req.body.githubUserInfo.avatar, req.body.githubUserInfo.profileLink]
+
+  //const userInfo = [req.body.username, req.body.token, req.body.githubUserInfo.avatar, req.body.githubUserInfo.profileLink];
+
   const statement = `INSERT INTO people (username, token, githubavatar, githublink) VALUES($1, $2, $3, $4) RETURNING *`;
 
   db.query(statement, userInfo, (err, result) => {
@@ -68,8 +102,6 @@ userController.addUser = (req, res, next) => {
         },
       });
     } else {
-      // save the newly created user information to res.locals
-      console.log("newuserline56", result.rows[0]);
       res.locals.user = result.rows[0];
       console.log(
         "User was successfully added to the database. Redirecting to home page."
@@ -96,7 +128,32 @@ userController.getCurUser = (req, res, next) => {
   });
 };
 
-// checks if user has a profile in the database: TESTED 3/7 5PM
+userController.addInterests = (req, res, next) => {
+
+  const defaultInterests = { _id: '', frontEnd: false, backEnd: false };
+  Object.keys(req.body).forEach((key) => { defaultInterests[key] = req.body[key]; })
+
+  const userInfo = [defaultInterests._id, defaultInterests.frontEnd, defaultInterests.backEnd];
+  const statement = `INSERT INTO interests (_id, frontend, backend) VALUES($1, $2, $3) ON CONFLICT (_id) DO UPDATE SET frontend = EXCLUDED.frontend, backend = EXCLUDED.backend RETURNING *`;
+
+  db.query(statement, userInfo, (err, result) => {
+    if (err) {
+      console.log('check user error obj\n', err);
+      return next({
+        log: 'There was an error with the addInterests query.',
+        message: {
+          err: 'An error occurred with the addInterests query.'
+        }
+      });
+    } else {
+      console.log('Interests was successfully added to the database. Redirecting to home page.');
+      res.locals.user = req.body
+      return next();
+    }
+  });
+
+};
+// checks if user has a profile in the database
 userController.checkProfile = (req, res, next) => {
   const username = [req.body.username];
   const statement = `SELECT user_profile FROM people WHERE username = $1`;
@@ -143,7 +200,6 @@ userController.addProfile = (req, res, next) => {
 // gets all users to display on swipe screen: TESTED 3/7 5:30PM
 userController.getAllUsers = (req, res, next) => {
   const statement = `SELECT * FROM people`;
-
   db.query(statement, (err, result) => {
     if (err) {
       return next({
@@ -154,6 +210,7 @@ userController.getAllUsers = (req, res, next) => {
       });
     } else {
       if (!result.rows.length) {
+
         return res
           .status(400)
           .json({ err: "There are no users in the database." });
@@ -194,7 +251,17 @@ userController.addPotential = (req, res, next) => {
   });
 };
 
-// returns user's matches. need to be filtered from allUsers on state
+
+/**
+ * ************************************************************************
+ *
+ * @description MIDDLEWARE FOR FILTERING MATCHES 
+ *
+ * ************************************************************************
+ */
+
+// returns user's matches. need to be filtered from allUsers on state 
+
 userController.filterMatches = (req, res, next) => {
   const user = [req.body.userId];
   const statement = `SELECT potential_matches_id, potential_matches_username FROM potentials WHERE _id = $1`;
@@ -218,6 +285,137 @@ userController.filterMatches = (req, res, next) => {
         return next();
       }
     }
+  });
+};
+
+
+
+/**
+ * ************************************************************************
+ *
+ * @description MIDDLEWARE FOR MANAGING SWIPING
+ *
+ * ************************************************************************
+ */
+
+userController.checkForSwipe = (req, res, next) => {
+  console.log('check for swipe engaged');
+  const queryInfo = [req.body.userId, req.body.targetId];
+  const statement = `SELECT * FROM matches where user_id = $1 AND target_id = $2`;
+
+  db.query(statement, queryInfo, (err, result) => {
+    if (err) {
+      return next({
+        log: 'There was an error with the checkForSwipe query',
+        message: {
+          err: 'An error occurred with the checkForSwipe query',
+        }
+      })
+    } else {
+      console.log('checkForSwipe result.rows\n', result.rows)
+      res.locals.swipes = result.rows;
+      return next();
+    };
+  });
+};
+
+userController.updateSwipes = (req, res, next) => {
+  console.log('update swipes engaged');
+
+  const queryInfo = [req.body.userId, req.body.targetId];
+  let statement;
+  console.log('res.locals.swipes.length === 0\n', res.locals.swipes.length === 0);
+  if (res.locals.swipes.length === 0) {
+    statement = `INSERT INTO matches (user_id, target_id, swipe, match_status) VALUES ($1, $2, TRUE, FALSE) RETURNING *`;
+  } else {
+    statement = `UPDATE matches SET swipe = TRUE WHERE user_id = $1 AND target_id = $2`;
+  }
+  db.query(statement, queryInfo, (err, result) => {
+    if (err) {
+      return next({
+        log: 'There was an error with the updateSwipes query',
+        message: {
+          err: 'An error occurred with the updateSwipes query',
+        }
+      })
+    } else {
+      console.log('updateSwipes result.rows\n', result.rows)
+      res.locals.swipes = result.rows;
+      return next();
+    };
+  });
+};
+
+userController.checkIfMatchMade = (req, res, next) => {
+  console.log('checkIfMatchMade engaged');
+
+  const queryInfo = [req.body.userId, req.body.targetId];
+  const statement = `SELECT * FROM matches WHERE (user_id = $1 AND target_id = $2) OR (user_id = $2 AND target_id = $1)`;
+
+  db.query(statement, queryInfo, (err, result) => {
+    if (err) {
+      return next({
+        log: 'There was an error with the checkIfMatchMade query',
+        message: {
+          err: 'An error occurred with the checkIfMatchMade query',
+        }
+      })
+    } else {
+      console.log('checkIfMatchMade result.rows\n', result.rows)
+      res.locals.matches = result.rows;
+      return next();
+    };
+  });
+};
+
+userController.updateMatches = (req, res, next) => {
+  console.log('updateMatches engaged');
+
+  const queryInfo = [req.body.userId, req.body.targetId];
+  const statement = `UPDATE matches set match_status = TRUE WHERE (user_id = $1 AND target_id = $2) OR (user_id = $2 AND target_id = $1)`;
+
+
+  if (res.locals.matches.length === 2 && res.locals.matches[0].swipe && res.locals.matches[1].swipe) {
+    console.log('THERE WAS A MATCH MADE!!!!');
+    db.query(statement, queryInfo, (err, result) => {
+      if (err) {
+        return next({
+          log: 'There was an error with the updateMatches query',
+          message: {
+            err: 'An error occurred with the updateMatches query',
+          }
+        })
+      } else {
+        console.log('updateMatches result.rows\n', result.rows)
+        return next();
+      };
+    });
+
+  } else {
+    console.log('no match was made');
+    return next();
+  };
+
+
+};
+
+userController.returnMatches = (req, res, next) => {
+  const queryInfo = [req.body.userId];
+  const statement = `SELECT target_id, people.* FROM matches LEFT JOIN people ON people._id = matches.target_id WHERE match_status = TRUE AND user_id = $1;`;
+
+  db.query(statement, queryInfo, (err, result) => {
+    if (err) {
+      return next({
+        log: 'There was an error with the returnMatches query\n' + err,
+        message: {
+          err: 'An error occurred with the returnMatches query',
+        }
+      })
+    } else {
+      console.log('returnMatches result.rows\n', result.rows)
+      res.locals.matches = result.rows;
+      return next();
+    };
   });
 };
 

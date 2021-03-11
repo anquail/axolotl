@@ -24,7 +24,9 @@ module.exports = () => {
         "/users/users": "http://localhost:3000",
         "/users/potential-matches": "http://localhost:3000",
         "/users/matches": "http://localhost:3000",
-      },
+        '/users/swipe': 'http://localhost:3000',
+        '/users/interests': 'http://localhost:3000'
+      }
     },
     output: {
       path: path.resolve(__dirname, "build"),

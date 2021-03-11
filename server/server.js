@@ -6,12 +6,13 @@
  * ************************************************************************
  */
 
-const express = require("express");
-const path = require("path");
-const fetch = require("node-fetch"); // allows requests to be made in dev mode
-const cors = require("cors");
-const cookieParser = require("cookie-parser");
-require("dotenv").config();
+const express = require('express');
+const path = require('path');
+const fetch = require('node-fetch'); // allows requests to be made in dev mode
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
+require('dotenv').config();
+
 
 const dbRouter = require("./routes/databaseRoutes");
 const authController = require("./controllers/authController");
@@ -49,6 +50,7 @@ const client_secret = process.env.GH_CLIENT_SECRET;
 // })
 
 //redirect to request Github acess this should probably be on client side
+
 app.get(
   "/login/auth",
   authController.getToken,
