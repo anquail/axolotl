@@ -8,38 +8,43 @@ import fetch from "isomorphic-fetch";
 
 // UNFIXED: login, click profile, refresh, then click matches makes app explode
 
-function Matches({ user, history }) {
+function Matches({ user, matches, setMatches, history }) {
   if (user.username === undefined) history.push("/");
-  const [matches, setMatches] = useState([]);
+  // const [matches, setMatches] = useState([]);
 
   const generateProfileCards = () => {
     if (matches.length) {
       return matches.map((match, i) => (
-        <ProfileCard key={`ProfileCard ${i}`} match={match} />
+        <ProfileCard
+          key={`ProfileCard ${i}`}
+          user={user}
+          match={match}
+          setMatches={setMatches}
+        />
       ));
     }
   };
 
-  useEffect(() => {
-    //grab info with fetch request
-    fetch("/users/matches", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userId: user._id,
-        //request more info to populate profile cards
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (Array.isArray(data)) setMatches(data);
-      })
-      .catch((err) => {
-        console.log(err, "matche error!");
-      });
-  }, []);
+  // useEffect(() => {
+  //   //grab info with fetch request
+  //   fetch("/users/matches", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify({
+  //       userId: user._id,
+  //       //request more info to populate profile cards
+  //     }),
+  //   })
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       if (Array.isArray(data)) setMatches(data);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err, "matche error!");
+  //     });
+  // }, []);
 
   return (
     <div className="matches">

@@ -5,7 +5,7 @@ const userController = {};
 // checks the database for the user: TESTED 3/7 5PM
 userController.checkUser = (req, res, next) => {
   const username = res.locals.jwtInfo.login; // save Github username on req.body
-  const statement = `SELECT p.*, i.frontend, i.backend FROM people AS p INNER JOIN interests AS i ON i._id = p._id WHERE username = $1`;
+  const statement = `SELECT p.*, i.frontend, i.backend FROM people AS p LEFT JOIN interests AS i ON i._id = p._id WHERE username = $1`;
 
   db.query(statement, [username], (err, result) => {
     if (err) {
@@ -112,6 +112,24 @@ userController.getCurUser = (req, res, next) => {
   });
 };
 
+userController.getUserInfo = (req, res, next) => {
+  // if (!res.locals.jwtInfo) return res.json(false);
+  console.log(req.body);
+  const userId = req.body._id * 1;
+  const statement = `SELECT p.*, i.frontend, i.backend FROM people AS p LEFT JOIN interests AS i ON i._id = p._id WHERE p._id = $1`;
+  db.query(statement, [userId], (err, result) => {
+    if (err)
+      return next({
+        log: "There was an error with the getUserInfo query.",
+        message: {
+          err: "An error occurred with the getUserInfo query.",
+        },
+      });
+    res.locals.user = result.rows[0];
+    return next();
+  });
+};
+
 userController.addInterests = (req, res, next) => {
   const defaultInterests = { _id: "", frontEnd: false, backEnd: false };
   Object.keys(req.body).forEach((key) => {
@@ -138,7 +156,27 @@ userController.addInterests = (req, res, next) => {
       console.log(
         "Interests was successfully added to the database. Redirecting to home page."
       );
-      res.locals.user = req.body;
+      return next();
+    }
+  });
+};
+
+userController.addBio = (req, res, next) => {
+  const userInfo = [req.body.bio];
+  const statement = `UPDATE people SET bio = $1 WHERE people._id = ${req.body._id} RETURNING *`;
+  db.query(statement, userInfo, (err, result) => {
+    if (err) {
+      console.log("check user error obj\n", err);
+      return next({
+        log: "There was an error with the addBio query.",
+        message: {
+          err: "An error occurred with the addBio query.",
+        },
+      });
+    } else {
+      console.log(
+        "User bio info was successfully added to the database. Redirecting to home page."
+      );
       return next();
     }
   });

@@ -4,42 +4,35 @@ import fetch from "isomorphic-fetch";
 import InterestsContainer from "../components/InterestsContainer.jsx";
 
 const Profile = ({ user, history, setUser }) => {
-  // if (user === undefined) history.push("/");
-
   const [submitting, setSubmitting] = useState(false);
   const [profileData, setProfileData] = useState({
     bio: user.bio || "",
     frontend: user.frontend,
     backend: user.backend,
   });
-  console.log(profileData);
+  console.log(user);
 
   const handleSubmit = (event) => {
     event.preventDefault();
     setSubmitting(true);
 
-    console.log("userNameId: ", document.getElementById("userNameId"));
-
-    // store profile info submitted by user
-    // const profileInfo = {
-    //   profile: formData,
-    //   username: props.user,
-    // }
-
     // post user data to server
-    fetch("http://localhost:8080/users/new-profile", {
+    fetch("http://localhost:8080/users/interests", {
       method: "POST",
       body: JSON.stringify({
-        // profile: formData,
-        username: user.username,
+        _id: user._id,
+        frontEnd: profileData.frontend,
+        backEnd: profileData.backend,
+        bio: profileData.bio,
       }),
       headers: {
         "Content-Type": "application/json; charset=UTF-8",
       },
     })
-      .then((response) => response.json())
-      .then((json) => {
-        console.log("json: ", json);
+      .then((res) => res.json())
+      .then((newUser) => {
+        console.log(newUser);
+        setUser(newUser);
       })
       .catch((err) => {
         console.log(err);
@@ -77,12 +70,17 @@ const Profile = ({ user, history, setUser }) => {
         <fieldset className="tallFieldSet">
           <label>
             <p>Interests:</p>
-            <InterestsContainer />
+            <InterestsContainer
+              frontend={profileData.frontend}
+              backend={profileData.backend}
+              setProfileData={setProfileData}
+              profileData={profileData}
+            />
           </label>
         </fieldset>
         <button type="submit">Submit</button>
       </form>
-      {submitting && <div>Submtting Info...</div>}
+      {submitting && <div>Submtted!</div>}
     </div>
   );
 };
