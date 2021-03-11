@@ -3,30 +3,7 @@ import { withRouter } from "react-router-dom";
 import UserCard from "../components/UserCard.jsx";
 import fetch from "isomorphic-fetch";
 
-const Home = ({
-  user,
-  setUser,
-  interests,
-  interestIdx,
-  setInterests,
-  setInterestIdx,
-}) => {
-  const [loggingIn, setLoggingIn] = useState(false);
-
-  useEffect(() => {
-    if (!Object.keys(user).length) {
-      setLoggingIn(true);
-      fetch("/api/currentUser")
-        .then((res) => res.json())
-        .then((data) => {
-          setUser(data);
-          setLoggingIn(false);
-          setInterests(data.interests);
-        })
-        .catch((error) => console.log("error in fetch /currentUser", error));
-    }
-  }, []);
-
+const Home = ({ user, interests, interestIdx, setInterestIdx }) => {
   const handleSwipe = (e, decision) => {
     if (decision === "accept") {
       fetch("/users/swipe", {
@@ -52,10 +29,8 @@ const Home = ({
         />
       </div>
     );
-  } else if (loggingIn) {
-    return <h1>Loading...</h1>;
   } else if (!Object.keys(user).length) {
-    return <h1>YOU NEED TO LOG IN</h1>;
+    return <h1>Loading...</h1>;
   } else {
     return (
       <div>

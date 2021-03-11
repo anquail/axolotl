@@ -69,7 +69,7 @@ authController.addJWT = (req, res, next) => {
 authController.verifyJWT = (req, res, next) => {
   const token = req.cookies.jwt;
   if (!token) {
-    return res.json();
+    return res.json(false);
   }
 
   // Verify Token

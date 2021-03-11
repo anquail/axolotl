@@ -16,21 +16,18 @@ const Profile = ({ user, history, setUser }) => {
 
   const [formData, setFormData] = useReducer(formReducer, {});
   const [submitting, setSubmitting] = useState(false);
-  const [components, setComponents] = useState({ bio: "", interests: {} });
 
-  useEffect(() => {
-    if (!Object.keys(user).length) {
-      fetch("/api/currentUser")
-        .then((res) => res.json())
-        .then((data) => {
-          console.log("data from fetch /currentUser is", data);
-          setUser(data);
-          setChecked({ bio: data.bio, interests: data.interests });
-          // props.history.push("/home");
-        })
-        .catch((error) => console.log("error in fetch /currentUser", error));
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (!Object.keys(user).length) {
+  //     fetch("/api/currentUser")
+  //       .then((res) => res.json())
+  //       .then((data) => {
+  //         console.log("data from fetch /currentUser is", data);
+  //         setUser(data);
+  //       })
+  //       .catch((error) => console.log("error in fetch /currentUser", error));
+  //   }
+  // }, []);
   // useEffect(() => {
   //   fetch("http://localhost:8080/users/profile", {
   //     method: "POST",
@@ -103,7 +100,7 @@ const Profile = ({ user, history, setUser }) => {
     <div className="profile">
       <h2>Profile Information</h2>
       <div style={{ height: "25px" }}>
-        <h4>{user.username ? user.username : " "}</h4>
+        <h4>{user.username ? user.username : null}</h4>
       </div>
 
       <form onSubmit={handleSubmit}>

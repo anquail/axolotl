@@ -58,7 +58,7 @@ app.get(
   userController.checkUser,
   userController.addUser,
   (req, res) => {
-    return res.redirect("http://localhost:8080/home");
+    return res.redirect("http://localhost:8080");
   }
 );
 
@@ -100,7 +100,7 @@ app.get("/matches", (req, res) => {
 });
 
 // catch-all route handler for requests to unknown routes
-app.use((req, res) => res.status(404).send("This page does not exist."));
+app.use((req, res) => res.redirect("/"));
 
 // global error handler
 app.use((err, req, res, next) => {

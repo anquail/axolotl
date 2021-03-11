@@ -28,8 +28,7 @@ userController.checkUser = (req, res, next) => {
         // if the user is in the database, send back user information and rediret to home page
         // res.locals.user = result.rows[0];
         console.log("User exists in the database. Redirecting to home page.");
-        return res.redirect("http://localhost:8080/home");
-        // return res.redirect("http://localhost:8080"); //.redirect('/homepage-url'); // is this allowed??? reroutes to home page somehow
+        return res.redirect("http://localhost:8080");
       }
     }
   });
@@ -97,6 +96,7 @@ userController.addUser = (req, res, next) => {
 };
 
 userController.getCurUser = (req, res, next) => {
+  if (!res.locals.jwtInfo) return res.json(false);
   const username = res.locals.jwtInfo.login;
   const statement = `SELECT * FROM people WHERE username = $1`;
   db.query(statement, [username], (err, result) => {
