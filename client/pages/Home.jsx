@@ -40,4 +40,4 @@ const Home = ({ user, interests, interestIdx, setInterestIdx }) => {
     );
   }
 };
-export default withRouter(Home);
+export default Home;

@@ -3,7 +3,7 @@ import { withRouter, useLocation, useHistory } from "react-router-dom";
 import fetch from "isomorphic-fetch";
 import regeneratorRuntime from "regenerator-runtime";
 
-const Login = React.memo(() => {
+const Login = () => {
   return (
     <div className="mainContainer">
       <div className="loginContainer">
@@ -20,6 +20,6 @@ const Login = React.memo(() => {
       </div>
     </div>
   );
-});
+};
 
-export default withRouter(Login);
+export default Login;
