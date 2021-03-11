@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import { withRouter } from "react-router-dom";
 import UserCard from "../components/UserCard.jsx";
 import fetch from "isomorphic-fetch";
-import regeneratorRuntime from "regenerator-runtime";
 
 const Home = ({ user, setUser }) => {
-  const [loggingIn, setLogginIn] = useState(false);
+  const [loggingIn, setLoggingIn] = useState(false);
+
   useEffect(() => {
     if (!Object.keys(user).length) {
-      setLogginIn(true);
+      setLoggingIn(true);
       fetch("/api/currentUser")
         .then((res) => res.json())
         .then((data) => {

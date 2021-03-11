@@ -6,13 +6,12 @@
  * ************************************************************************
  */
 
-const express = require('express');
-const path = require('path');
-const fetch = require('node-fetch'); // allows requests to be made in dev mode
-const cors = require('cors');
-const cookieParser = require('cookie-parser');
-require('dotenv').config();
-
+const express = require("express");
+const path = require("path");
+const fetch = require("node-fetch"); // allows requests to be made in dev mode
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+require("dotenv").config();
 
 const dbRouter = require("./routes/databaseRoutes");
 const authController = require("./controllers/authController");
@@ -91,6 +90,14 @@ app.get("/", (req, res) => {
 });
 
 app.get("/home", (req, res) => {
+  res.sendFile(path.join(__dirname, "../client/index.html"));
+});
+
+app.get("/profile", (req, res) => {
+  res.sendFile(path.join(__dirname, "../client/index.html"));
+});
+
+app.get("/matches", (req, res) => {
   res.sendFile(path.join(__dirname, "../client/index.html"));
 });
 
