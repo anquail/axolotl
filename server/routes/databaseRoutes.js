@@ -4,7 +4,7 @@ const userController = require("../controllers/userController");
 const router = express.Router();
 
 // handles requests to login
-// router.post('/login', 
+// router.post('/login',
 //   userController.checkUser,
 //   userController.findInterests,
 //   userController.addUser,
@@ -13,10 +13,16 @@ const router = express.Router();
 //   }
 // );
 
-
-router.post('/interests', userController.addInterests, userController.findInterests, (req, res) => {
-  return res.status(200).json(res.locals.user)
-})
+router.post(
+  "/interests",
+  userController.addInterests,
+  userController.addBio,
+  userController.getUserInfo,
+  userController.findInterests,
+  (req, res) => {
+    return res.status(200).json(res.locals.user);
+  }
+);
 
 // handles get requests for user profile
 router.post("/profile", userController.checkProfile, (req, res) => {
@@ -33,11 +39,9 @@ router.get("/users", userController.getAllUsers, (req, res) => {
   return res.status(200).json(res.locals.allUsers);
 });
 
-router.post("/users",
-  userController.getAllPotentials,
-  (req, res) => {
-    return res.status(200).json(res.locals.potentials);
-  });
+router.post("/users", userController.getAllPotentials, (req, res) => {
+  return res.status(200).json(res.locals.potentials);
+});
 
 // handles post requests to matches table
 router.post("/potential-matches", userController.addPotential, (req, res) => {
@@ -54,13 +58,13 @@ router.post(
   userController.returnMatches,
   // userController.filterMatches, // do not use this middleware anymore
   (req, res) => {
-    console.log('SERVER-SIDE MATCHES:', res.locals.matches);
+    console.log("SERVER-SIDE MATCHES:", res.locals.matches);
     return res.status(200).json(res.locals.matches);
   }
 );
 
 // // original code to handle matches
-// router.post('/matches', 
+// router.post('/matches',
 //   (req, res, next) => {
 //     console.log(req.body)
 //     return next();
@@ -72,13 +76,14 @@ router.post(
 //   }
 // );
 
-router.post('/swipe',
+router.post(
+  "/swipe",
   userController.checkForSwipe,
   userController.updateSwipes,
   userController.checkIfMatchMade,
   userController.updateMatches,
   (req, res) => {
-    console.log('completed swipe updates');
+    console.log("completed swipe updates");
     return res.status(200).json(res.locals.matches);
   }
 );

@@ -14,7 +14,7 @@
 
 CREATE TABLE public.people (
   _id serial PRIMARY KEY NOT NULL,
-  username varchar NOT NULL,
+  username varchar NOT NULL UNIQUE,
   token varchar NOT NULL,
   matches integer,
   potentials integer,
