@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import ProfileCard from "../components/ProfileCard.jsx";
 import { withRouter } from "react-router-dom";
 import ProfilePicture from "../components/ProfilePicture.jsx";
-import fetch from "isomorphic-fetch";
 
 ///client/components/ProfilePicture.jsx
 
@@ -11,6 +10,26 @@ import fetch from "isomorphic-fetch";
 function Matches({ user, matches, setMatches, history }) {
   if (user.username === undefined) history.push("/");
   // const [matches, setMatches] = useState([]);
+
+  useEffect(() => {
+    fetch("/users/matches", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: user._id,
+        //request more info to populate profile cards
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (Array.isArray(data)) setMatches(data);
+      })
+      .catch((err) => {
+        console.log(err, "matche error!");
+      });
+  }, []);
 
   const generateProfileCards = () => {
     if (matches.length) {
