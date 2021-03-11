@@ -40,7 +40,7 @@ userController.findInterests = (req, res, next) => {
   const username = [res.locals.user._id]; // save Github username on req.body
   const statement = `SELECT p.*, i1.frontend, i1.backend FROM interests AS i1 INNER JOIN interests AS i2 ON i1.frontend = i2.frontend OR i1.backend = i2.backend INNER JOIN people AS p ON i1._id = p._id WHERE i2._id = $1`;
 
-  db.query(statement, username, (err, result) => {
+  db.query(statement, userId, (err, result) => {
     if (err) {
       console.log("check user error obj\n", err);
       return next({
@@ -54,9 +54,10 @@ userController.findInterests = (req, res, next) => {
         console.log("User does not have any matching in database.");
         return res.status(200).json(res.locals.user);
       } else {
-        res.locals.user.interests = result.rows;
-        console.log("User exists in the database. Redirecting to home page.");
-        return res.status(200).json(res.locals.user);
+        const interestsArr = result.rows.filter(obj=> `${obj._id}` !== res.locals.user._id);
+        res.locals.user.interests = interestsArr;
+        console.log('User exists in the database. Redirecting to home page.');
+        return res.status(200).json(res.locals.user)
       }
     }
   });
@@ -65,8 +66,6 @@ userController.findInterests = (req, res, next) => {
 userController.addUser = (req, res, next) => {
   // github username and token should be available on req.body
   // mock data for now
-  // const userInfo = [`testUser${Math.floor(Math.random() * 100)}`, Math.floor(Math.random() * 100)];
-
   console.log(res.locals.user);
   const userInfo = [
     res.locals.jwtInfo.login,
@@ -76,12 +75,6 @@ userController.addUser = (req, res, next) => {
     // req.body.githubUserInfo.profileLink
     res.locals.user.url,
   ];
-  console.log("userinforline43", userInfo);
-  // const statement = `INSERT INTO people (username, token, github_user_info) VALUES($1, $2, $3) RETURNING *`;
-  // const userInfo = [req.body.username, req.body.token, req.body.githubUserInfo.avatar, req.body.githubUserInfo.profileLink]
-
-  //const userInfo = [req.body.username, req.body.token, req.body.githubUserInfo.avatar, req.body.githubUserInfo.profileLink];
-
   const statement = `INSERT INTO people (username, token, githubavatar, githublink) VALUES($1, $2, $3, $4) RETURNING *`;
 
   db.query(statement, userInfo, (err, result) => {
@@ -414,6 +407,28 @@ userController.returnMatches = (req, res, next) => {
       return next();
     }
   });
+};
+
+// return all potential users (not current user, not currently matched, and share interests with main user)
+userController.getAllPotentials = (req, res, next) => {
+  const queryInfo = [req.body.userId, req.body.interest_frontEnd, req.body.interest_backend];
+  const statement = `SELECT * FROM people ppl LEFT JOIN interests i ON i._id = ppl._id WHERE ppl._id <> $1 AND ppl._id NOT IN (SELECT target_ID FROM matches WHERE user_id = 1) AND i.frontend = $2 AND i.backend = $3;`;
+  
+  db.query(statement, queryInfo, (err, result) => {
+    if (err) {
+      return next({
+        log: 'There was an error with the getAllPotentials query\n' + err,
+        message: {
+          err: 'An error occurred with the getAllPotentials query',
+        }
+      })
+    } else {
+      console.log('getAllPotentials result.rows\n', result.rows)
+      res.locals.potentials = result.rows;
+      return next();
+    };
+  });
+  
 };
 
 module.exports = userController;

@@ -20,7 +20,8 @@ CREATE TABLE public.people (
   potentials integer,
   interests integer,
   githubavatar varchar,
-  githublink varchar
+  githublink varchar,
+  bio varchar
 );
 
 -- CREATE TABLE public.matches (
