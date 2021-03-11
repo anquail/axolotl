@@ -5,8 +5,8 @@ const userController = {};
 // checks the database for the user: TESTED 3/7 5PM
 userController.checkUser = (req, res, next) => {
   const username = res.locals.jwtInfo.login; // save Github username on req.body
-  const statement = `SELECT * FROM people WHERE username = $1`;
-  console.log("inside usercontroller check user");
+  const statement = `SELECT p.*, i.frontend, i.backend FROM people AS p INNER JOIN interests AS i ON i._id = p._id WHERE username = $1`;
+
   db.query(statement, [username], (err, result) => {
     if (err) {
       console.log("check user error obj\n", err);
@@ -26,10 +26,9 @@ userController.checkUser = (req, res, next) => {
         return next();
       } else {
         // if the user is in the database, send back user information and rediret to home page
-        res.locals.user = result.rows[0];
+        // res.locals.user = result.rows[0];
         console.log("User exists in the database. Redirecting to home page.");
-        return res.redirect("http://localhost:8080/home");
-        // return res.redirect("http://localhost:8080"); //.redirect('/homepage-url'); // is this allowed??? reroutes to home page somehow
+        return res.redirect("http://localhost:8080");
       }
     }
   });
@@ -37,10 +36,11 @@ userController.checkUser = (req, res, next) => {
 
 userController.findInterests = (req, res, next) => {
   if (!res.locals.user) return next();
+  console.log(res.locals.user);
   const username = [res.locals.user._id]; // save Github username on req.body
   const statement = `SELECT p.*, i1.frontend, i1.backend FROM interests AS i1 INNER JOIN interests AS i2 ON i1.frontend = i2.frontend OR i1.backend = i2.backend INNER JOIN people AS p ON i1._id = p._id WHERE i2._id = $1`;
 
-  db.query(statement, userId, (err, result) => {
+  db.query(statement, username, (err, result) => {
     if (err) {
       console.log("check user error obj\n", err);
       return next({
@@ -54,19 +54,18 @@ userController.findInterests = (req, res, next) => {
         console.log("User does not have any matching in database.");
         return res.status(200).json(res.locals.user);
       } else {
-        const interestsArr = result.rows.filter(obj=> `${obj._id}` !== res.locals.user._id);
+        const interestsArr = result.rows.filter(
+          (obj) => `${obj._id}` != res.locals.user._id
+        );
         res.locals.user.interests = interestsArr;
-        console.log('User exists in the database. Redirecting to home page.');
-        return res.status(200).json(res.locals.user)
+        console.log("User exists in the database. Redirecting to home page.");
+        return res.status(200).json(res.locals.user);
       }
     }
   });
 };
 // adds user to the database upon first OAuth: TESTED 3/7 5PM
 userController.addUser = (req, res, next) => {
-  // github username and token should be available on req.body
-  // mock data for now
-  console.log(res.locals.user);
   const userInfo = [
     res.locals.jwtInfo.login,
     res.locals.token,
@@ -97,15 +96,15 @@ userController.addUser = (req, res, next) => {
 };
 
 userController.getCurUser = (req, res, next) => {
-  console.log(res.locals);
+  if (!res.locals.jwtInfo) return res.json(false);
   const username = res.locals.jwtInfo.login;
-  const statement = `SELECT * FROM people WHERE username = $1`;
+  const statement = `SELECT p.*, i.frontend, i.backend FROM people AS p INNER JOIN interests AS i ON i._id = p._id WHERE username = $1`;
   db.query(statement, [username], (err, result) => {
     if (err)
       return next({
         log: "There was an error with the getCurUser query.",
         message: {
-          err: "An error occurred with the getCurUSer query.",
+          err: "An error occurred with the getCurUser query.",
         },
       });
     res.locals.user = result.rows[0];
@@ -411,24 +410,27 @@ userController.returnMatches = (req, res, next) => {
 
 // return all potential users (not current user, not currently matched, and share interests with main user)
 userController.getAllPotentials = (req, res, next) => {
-  const queryInfo = [req.body.userId, req.body.interest_frontEnd, req.body.interest_backend];
-  const statement = `SELECT * FROM people ppl LEFT JOIN interests i ON i._id = ppl._id WHERE ppl._id <> $1 AND ppl._id NOT IN (SELECT target_ID FROM matches WHERE user_id = 1) AND i.frontend = $2 AND i.backend = $3;`;
-  
+  const queryInfo = [
+    req.body.userId,
+    req.body.interest_frontEnd,
+    req.body.interest_backend,
+  ];
+  const statement = `SELECT * FROM people ppl LEFT JOIN interests i ON i._id = ppl._id WHERE ppl._id <> $1 AND ppl._id NOT IN (SELECT target_ID FROM matches WHERE user_id = $1) AND i.frontend = $2 AND i.backend = $3;`;
+
   db.query(statement, queryInfo, (err, result) => {
     if (err) {
       return next({
-        log: 'There was an error with the getAllPotentials query\n' + err,
+        log: "There was an error with the getAllPotentials query\n" + err,
         message: {
-          err: 'An error occurred with the getAllPotentials query',
-        }
-      })
+          err: "An error occurred with the getAllPotentials query",
+        },
+      });
     } else {
-      console.log('getAllPotentials result.rows\n', result.rows)
+      console.log("getAllPotentials result.rows\n", result.rows);
       res.locals.potentials = result.rows;
       return next();
-    };
+    }
   });
-  
 };
 
 module.exports = userController;

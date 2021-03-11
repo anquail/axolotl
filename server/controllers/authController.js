@@ -8,7 +8,6 @@ const jwtSecret = "super-secret-secret";
 const authController = {};
 
 authController.getToken = (req, res, next) => {
-  console.log("inside getToken");
   axios
     .post("https://github.com/login/oauth/access_token", {
       client_id: client_id,
@@ -18,24 +17,14 @@ authController.getToken = (req, res, next) => {
     .then((response) => new URLSearchParams(response.data))
     .then((params) => {
       res.locals.token = params.get("access_token");
-      //   console.log(params.get("access_token"));
       return next();
     })
-    // .then((params) => {
-    //   console.log("ACCESS_TOKEN: ", params.get("access_token"));
-    //   // SET COOKIE HERE??
-    //   res.locals.token = params.get("access_token");
-    //   return next();
-    //   //   return res.status(200).json(params.get("access_token"));
-    // })
     .catch((error) =>
       next({ log: "error in authController.getToken", message: { err: error } })
     );
 };
 
 authController.getUserFromGH = (req, res, next) => {
-  console.log("inside getUserFromGH");
-
   fetch(`https://api.github.com/user`, {
     headers: {
       Authorization: `token ${res.locals.token}`,
@@ -55,23 +44,22 @@ authController.getUserFromGH = (req, res, next) => {
 };
 
 authController.addJWT = (req, res, next) => {
-  console.log("inside addJWT");
-  console.log(res.locals.user);
-
   const { login, id } = res.locals.user;
 
   jwt.sign(
     { login, id },
     jwtSecret,
     {
-      expiresIn: "1h",
+      expiresIn: "24h",
     },
     (err, token) => {
       if (err) {
-        return res.status(400).json("error creating jwt");
+        return next({
+          log: "error in authController.addJWT",
+          message: { err: error },
+        });
       }
       res.cookie("jwt", token, { httpOnly: true });
-      console.log("inside addJWT next");
       res.locals.jwtInfo = { login, id };
       return next();
     }
@@ -80,15 +68,13 @@ authController.addJWT = (req, res, next) => {
 
 authController.verifyJWT = (req, res, next) => {
   const token = req.cookies.jwt;
-  console.log("verify JWT");
-  console.log(token);
   if (!token) {
-    return res.json();
+    return res.json(false);
   }
 
   // Verify Token
   jwt.verify(token, jwtSecret, (err, decoded) => {
-    if (!decoded) return res.json();
+    if (!decoded) return res.json(false);
     const { login, id } = decoded;
     res.locals.jwtInfo = { login, id };
 

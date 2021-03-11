@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 
-const UserCard = (props) => {
-  const { currPotMatch, handleSwipe } = props;
-  console.log(currPotMatch); // PASS USER ID TO BACKEND
-
+const UserCard = ({ curInterest, handleSwipe }) => {
   const [cardClass, setCardClass] = useState("userCard slide-in-bottom");
 
   const swipes = (e, decision) => {
@@ -21,28 +18,18 @@ const UserCard = (props) => {
       }}
     >
       <div className="cardContents">
-        <img
-          src={
-            currPotMatch.github_user_info
-              ? currPotMatch.github_user_info.avatar
-              : `https://github.com/${currPotMatch.username}.png`
-          }
-          alt="profile pic"
-        />
+        <img src={curInterest.githubavatar} alt="profile pic" />
         <div className="cardText">
-          <h2>{currPotMatch.username}</h2>
+          <h2>{curInterest.username}</h2>
           <hr />
           <p>
             <strong>Wants to study: </strong>
-            {currPotMatch.user_profile
-              ? currPotMatch.user_profile.userInterest1
-              : "No skills to improve."}
+            {curInterest.backend ? "Back End    " : null}
+            {curInterest.frontend ? "Front End" : null}
           </p>
           <p>
-            <strong>Interests: </strong>
-            {currPotMatch.user_profile
-              ? currPotMatch.user_profile.userInterest2
-              : "Not interested in anything."}
+            <strong>Bio: </strong>
+            {curInterest.bio || "User is too lazy to put in their bio"}
           </p>
         </div>
         <div className="swipeBtns">
