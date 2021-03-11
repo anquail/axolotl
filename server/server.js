@@ -67,6 +67,7 @@ app.get(
   "/api/currentUser",
   authController.verifyJWT,
   userController.getCurUser,
+  userController.findInterests,
   // getuser from database and store in res.locals
   (req, res) => {
     console.log("here is res.locals.user before sent!!!", res.locals.user);

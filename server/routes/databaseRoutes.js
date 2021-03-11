@@ -4,14 +4,14 @@ const userController = require("../controllers/userController");
 const router = express.Router();
 
 // handles requests to login
-router.post('/login', 
-  userController.checkUser,
-  userController.findInterests,
-  userController.addUser,
-  (req, res) => {
-    return res.status(200).json(res.locals.user)//.redirect('/homepage-url');
-  }
-);
+// router.post('/login', 
+//   userController.checkUser,
+//   userController.findInterests,
+//   userController.addUser,
+//   (req, res) => {
+//     return res.status(200).json(res.locals.user)//.redirect('/homepage-url');
+//   }
+// );
 
 
 router.post('/interests', userController.addInterests, userController.findInterests, (req, res) => {
@@ -32,6 +32,12 @@ router.post("/new-profile", userController.addProfile, (req, res) => {
 router.get("/users", userController.getAllUsers, (req, res) => {
   return res.status(200).json(res.locals.allUsers);
 });
+
+router.post("/users",
+  userController.getAllPotentials,
+  (req, res) => {
+    return res.status(200).json(res.locals.potentials);
+  });
 
 // handles post requests to matches table
 router.post("/potential-matches", userController.addPotential, (req, res) => {
