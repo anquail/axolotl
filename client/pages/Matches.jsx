@@ -6,58 +6,18 @@ import fetch from "isomorphic-fetch";
 
 ///client/components/ProfilePicture.jsx
 
-function Matches(props) {
-  const { user } = props;
-  console.log(user._id);
-  if (user.username === undefined) props.history.push("/");
+// UNFIXED: login, click profile, refresh, then click matches makes app explode
 
+function Matches({ user, history }) {
+  if (user.username === undefined) history.push("/");
   const [matches, setMatches] = useState([]);
 
-  // const { img, userName } = props.user;
-
-  /**
-   *
-   * @param {String} userId - The user id for the current logged in user
-   * Method assumes that there will be a 'matches' API that will accept a user id, and return a list of matches
-   */
-  const fetchMatches = async (userId) => {
-    // SAMPLE fetch code for when the matches API is ready
-
-    // placeholder code start - replace with fetch to 'matches' API to get match data for logged in user (sample code above)
-    const dummyMatches = [];
-    for (let i = 0; i < 10; i++) {
-      dummyMatches.push({
-        img:
-          "https://avatars.githubusercontent.com/u/51981800?s=460&u=49ffbe604fc41d779df1b19a2929b5b23e996077&v=4",
-        name: "Dummy Match " + i,
-        id: i,
-        description:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer eu libero neque. Nam dignissim dignissim molestie. Nulla lobortis magna sit amet neque lacinia, sit amet.",
-      });
-    }
-
-    setMatches(dummyMatches);
-    // placeholder code end
-  };
-
   const generateProfileCards = () => {
-    let matchset = new Set();
-    matches.forEach((match, index) => {
-      matchset.add(match.potential_matches_username);
-    });
-    const cards = [];
-    let i = 0;
-    for (let value of matchset.values()) {
-      cards.push(
-        <ProfileCard
-          key={`ProfileCard ${i}`}
-          user={value}
-          className="profile-card"
-        />
-      );
-      i++;
+    if (matches.length) {
+      return matches.map((match, i) => (
+        <ProfileCard key={`ProfileCard ${i}`} match={match} />
+      ));
     }
-    return cards;
   };
 
   useEffect(() => {
@@ -74,7 +34,6 @@ function Matches(props) {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log("CLIENT-SIDE FILTERED MATCHES:", data);
         if (Array.isArray(data)) setMatches(data);
       })
       .catch((err) => {

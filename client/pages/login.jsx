@@ -3,7 +3,7 @@ import { withRouter, useLocation, useHistory } from "react-router-dom";
 import fetch from "isomorphic-fetch";
 import regeneratorRuntime from "regenerator-runtime";
 
-const Login = React.memo((props) => {
+const Login = React.memo(() => {
   return (
     <div className="mainContainer">
       <div className="loginContainer">
