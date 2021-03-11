@@ -3,10 +3,15 @@ import { withRouter } from "react-router-dom";
 import UserCard from "../components/UserCard.jsx";
 import fetch from "isomorphic-fetch";
 
-const Home = ({ user, setUser }) => {
+const Home = ({
+  user,
+  setUser,
+  interests,
+  interestIdx,
+  setInterests,
+  setInterestIdx,
+}) => {
   const [loggingIn, setLoggingIn] = useState(false);
-  const [interests, setInterests] = useState([]);
-  const [interestIdx, setInterestIdx] = useState(0);
 
   useEffect(() => {
     if (!Object.keys(user).length) {
@@ -14,7 +19,6 @@ const Home = ({ user, setUser }) => {
       fetch("/api/currentUser")
         .then((res) => res.json())
         .then((data) => {
-          console.log("data from fetch /currentUser is", data);
           setUser(data);
           setLoggingIn(false);
           setInterests(data.interests);

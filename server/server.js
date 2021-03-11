@@ -67,7 +67,6 @@ app.get(
   authController.verifyJWT,
   userController.getCurUser,
   userController.findInterests,
-  // getuser from database and store in res.locals
   (req, res) => {
     return res.status(200).json(res.locals.user);
   }

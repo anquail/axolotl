@@ -9,13 +9,22 @@ import fetch from "node-fetch";
 
 const App = React.memo((props) => {
   const [user, setUser] = useState({});
+  const [interests, setInterests] = useState([]);
+  const [interestIdx, setInterestIdx] = useState(0);
 
   return (
     <div className="mainContainer">
       <Switch>
         <Route exact path="/home">
           <NavBar />
-          <Home user={user} setUser={setUser} />
+          <Home
+            user={user}
+            setUser={setUser}
+            interests={interests}
+            setInterests={setInterests}
+            interestIdx={interestIdx}
+            setInterestIdx={setInterestIdx}
+          />
         </Route>
         <Route path="/profile">
           <NavBar />
@@ -26,7 +35,7 @@ const App = React.memo((props) => {
           <Matches user={user} />
         </Route>
         <Route path="/">
-          <Login user={user} />
+          <Login />
         </Route>
       </Switch>
     </div>

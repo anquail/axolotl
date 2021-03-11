@@ -6,7 +6,7 @@ const userController = {};
 userController.checkUser = (req, res, next) => {
   const username = res.locals.jwtInfo.login; // save Github username on req.body
   const statement = `SELECT * FROM people WHERE username = $1`;
-  console.log("inside usercontroller check user");
+
   db.query(statement, [username], (err, result) => {
     if (err) {
       console.log("check user error obj\n", err);
@@ -26,7 +26,7 @@ userController.checkUser = (req, res, next) => {
         return next();
       } else {
         // if the user is in the database, send back user information and rediret to home page
-        res.locals.user = result.rows[0];
+        // res.locals.user = result.rows[0];
         console.log("User exists in the database. Redirecting to home page.");
         return res.redirect("http://localhost:8080/home");
         // return res.redirect("http://localhost:8080"); //.redirect('/homepage-url'); // is this allowed??? reroutes to home page somehow
@@ -67,9 +67,6 @@ userController.findInterests = (req, res, next) => {
 };
 // adds user to the database upon first OAuth: TESTED 3/7 5PM
 userController.addUser = (req, res, next) => {
-  // github username and token should be available on req.body
-  // mock data for now
-  console.log(res.locals.user);
   const userInfo = [
     res.locals.jwtInfo.login,
     res.locals.token,

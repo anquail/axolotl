@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 
 const UserCard = ({ curInterest, handleSwipe }) => {
-  console.log(curInterest); // PASS USER ID TO BACKEND
-
   const [cardClass, setCardClass] = useState("userCard slide-in-bottom");
 
   const swipes = (e, decision) => {
