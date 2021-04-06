@@ -1,16 +1,15 @@
-import React, { useReducer, useState, useEffect } from "react";
+import React, { useState } from "react";
 import { withRouter } from "react-router-dom";
 import fetch from "isomorphic-fetch";
 import InterestsContainer from "../components/InterestsContainer.jsx";
 
-const Profile = ({ user, history, setUser }) => {
+const Profile = ({ user, setUser }) => {
   const [submitting, setSubmitting] = useState(false);
   const [profileData, setProfileData] = useState({
     bio: user.bio || "",
     frontend: user.frontend,
     backend: user.backend,
   });
-  console.log(user);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -64,6 +63,7 @@ const Profile = ({ user, history, setUser }) => {
               id="userNameInterest1Id"
               onChange={handleChange}
               value={profileData.bio}
+              style={{ fontSize: "16px" }}
             />
           </label>
         </fieldset>

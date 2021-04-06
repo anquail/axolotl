@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
 @import "navbar";
 @import "colors";
 @import "profile";
@@ -8,8 +8,12 @@
 @import "profilepicture";
 @import "matches";
 
+* {
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
 
-#root{
+#root {
   min-height: 889px;
 }
 
@@ -18,18 +22,18 @@ html {
   align-items: center;
   justify-content: center;
   background-color: $background-color;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
 }
 
-body{
-  display:flex;
+body {
+  display: flex;
   align-items: center;
   justify-content: center;
   height: 100%;
   width: 100%;
 }
 
-div{
+div {
   max-width: 420px;
 }
 
@@ -41,23 +45,26 @@ div{
 }
 
 .slide-in-top {
-	-webkit-animation: slide-in-top 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-	        animation: slide-in-top 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+  -webkit-animation: slide-in-top 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  animation: slide-in-top 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
 }
 
 .slide-in-bottom {
-	-webkit-animation: slide-in-bottom 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
-	        animation: slide-in-bottom 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+  -webkit-animation: slide-in-bottom 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+    both;
+  animation: slide-in-bottom 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
 }
 
 .slide-out-right {
-	-webkit-animation: slide-out-right 0.5s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
-	        animation: slide-out-right 0.5s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
+  -webkit-animation: slide-out-right 0.5s cubic-bezier(0.55, 0.085, 0.68, 0.53)
+    both;
+  animation: slide-out-right 0.5s cubic-bezier(0.55, 0.085, 0.68, 0.53) both;
 }
 
 .slide-out-left {
-	-webkit-animation: slide-out-left 0.5s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
-	        animation: slide-out-left 0.5s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
+  -webkit-animation: slide-out-left 0.5s cubic-bezier(0.55, 0.085, 0.68, 0.53)
+    both;
+  animation: slide-out-left 0.5s cubic-bezier(0.55, 0.085, 0.68, 0.53) both;
 }
 
 .userCard {
@@ -87,12 +94,12 @@ div{
       background-color: $light-border-color;
     }
 
-    h2{
+    h2 {
       color: $main-font-color;
     }
   }
 
-  .swipeBtns{
+  .swipeBtns {
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -106,7 +113,7 @@ div{
       padding: 8px 10px;
       cursor: pointer;
 
-      &:hover{
+      &:hover {
         box-shadow: 0px 0px 20px rgb(91, 91, 91);
       }
     }
@@ -121,7 +128,7 @@ div{
 
     i {
       color: $light-border-color;
-      &:hover{
+      &:hover {
         cursor: pointer;
         filter: blur(1px);
       }
@@ -141,27 +148,27 @@ div{
  * animation slide-in-fwd-center
  * ----------------------------------------
  */
- @-webkit-keyframes slide-in-top {
+@-webkit-keyframes slide-in-top {
   0% {
     -webkit-transform: translateY(-1000px);
-            transform: translateY(-1000px);
+    transform: translateY(-1000px);
     opacity: 0;
   }
   100% {
     -webkit-transform: translateY(0);
-            transform: translateY(0);
+    transform: translateY(0);
     opacity: 1;
   }
 }
 @keyframes slide-in-top {
   0% {
     -webkit-transform: translateY(-1000px);
-            transform: translateY(-1000px);
+    transform: translateY(-1000px);
     opacity: 0;
   }
   100% {
     -webkit-transform: translateY(0);
-            transform: translateY(0);
+    transform: translateY(0);
     opacity: 1;
   }
 }
@@ -178,83 +185,77 @@ div{
  * animation slide-in-bottom
  * ----------------------------------------
  */
- @-webkit-keyframes slide-in-bottom {
+@-webkit-keyframes slide-in-bottom {
   0% {
     -webkit-transform: translateY(1000px);
-            transform: translateY(1000px);
+    transform: translateY(1000px);
     opacity: 0;
   }
   100% {
     -webkit-transform: translateY(0);
-            transform: translateY(0);
+    transform: translateY(0);
     opacity: 1;
   }
 }
 @keyframes slide-in-bottom {
   0% {
     -webkit-transform: translateY(1000px);
-            transform: translateY(1000px);
+    transform: translateY(1000px);
     opacity: 0;
   }
   100% {
     -webkit-transform: translateY(0);
-            transform: translateY(0);
+    transform: translateY(0);
     opacity: 1;
   }
 }
 
-
- @-webkit-keyframes slide-out-right {
+@-webkit-keyframes slide-out-right {
   0% {
     -webkit-transform: translateX(0);
-            transform: translateX(0);
+    transform: translateX(0);
     opacity: 1;
   }
   100% {
     -webkit-transform: translateX(1000px);
-            transform: translateX(1000px);
+    transform: translateX(1000px);
     opacity: 0;
   }
 }
 @keyframes slide-out-right {
   0% {
     -webkit-transform: translateX(0);
-            transform: translateX(0);
+    transform: translateX(0);
     opacity: 1;
   }
   100% {
     -webkit-transform: translateX(1000px);
-            transform: translateX(1000px);
+    transform: translateX(1000px);
     opacity: 0;
   }
 }
 
- @-webkit-keyframes slide-out-left {
+@-webkit-keyframes slide-out-left {
   0% {
     -webkit-transform: translateX(0);
-            transform: translateX(0);
+    transform: translateX(0);
     opacity: 1;
   }
   100% {
     -webkit-transform: translateX(-1000px);
-            transform: translateX(-1000px);
+    transform: translateX(-1000px);
     opacity: 0;
   }
 }
 @keyframes slide-out-left {
   0% {
     -webkit-transform: translateX(0);
-            transform: translateX(0);
+    transform: translateX(0);
     opacity: 1;
   }
   100% {
     -webkit-transform: translateX(-1000px);
-            transform: translateX(-1000px);
+    transform: translateX(-1000px);
     opacity: 0;
   }
 }
-
-
-
-
-
