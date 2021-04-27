@@ -14,3 +14,6 @@ You can run dotConnect in three different modes:
 1. `npm run dev` for "development"
 2. `npm run build` and `npm start` for "production"
 3. `npm run test` for "testing"
+
+## Want to contribute?
+We are always looking to improve dotConnect. Fork and clone this repository, make edits, and open a well-documented pull request to this repository!
