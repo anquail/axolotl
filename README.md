@@ -16,4 +16,4 @@ You can run dotConnect in three different modes:
 3. `npm run test` for "testing"
 
 ## Want to contribute?
-We are always looking to improve dotConnect. Fork and clone this repository, make edits, and open a well-documented pull request to this repository!
+We are always looking to improve dotConnect. Fork and clone this repository, make your contributions, and open a well-documented pull request to this repository!
