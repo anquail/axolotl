@@ -3,7 +3,7 @@ import React, { useState } from "react";
 const UserCard = ({ curInterest, handleSwipe }) => {
   const [cardClass, setCardClass] = useState("userCard slide-in-bottom");
 
-  const swipes = (e, decision) => {
+  const swipes = (decision) => {
     if (decision === "reject") setCardClass("userCard slide-out-left");
     else setCardClass("userCard slide-out-right");
   };
@@ -13,8 +13,8 @@ const UserCard = ({ curInterest, handleSwipe }) => {
       className={cardClass}
       onAnimationEnd={(e) => {
         setCardClass("userCard slide-in-bottom");
-        if (e.animationName === "slide-out-left") handleSwipe(e, "reject");
-        if (e.animationName === "slide-out-right") handleSwipe(e, "accept");
+        if (e.animationName === "slide-out-left") handleSwipe("reject");
+        if (e.animationName === "slide-out-right") handleSwipe("accept");
       }}
     >
       <div className="cardContents">
@@ -33,10 +33,10 @@ const UserCard = ({ curInterest, handleSwipe }) => {
           </p>
         </div>
         <div className="swipeBtns">
-          <button className="reject" onClick={(e) => swipes(e, "reject")}>
+          <button className="reject" onClick={(e) => swipes("reject")}>
             <i className="fal fa-times-circle fa-5x"></i>
           </button>
-          <button className="accept" onClick={(e) => swipes(e, "accept")}>
+          <button className="accept" onClick={(e) => swipes("accept")}>
             <i className="fal fa-check-circle fa-5x"></i>
           </button>
         </div>
