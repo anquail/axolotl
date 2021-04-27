@@ -1,7 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { withRouter, useLocation, useHistory } from "react-router-dom";
-import fetch from "isomorphic-fetch";
-import regeneratorRuntime from "regenerator-runtime";
 
 const Login = () => {
   return (

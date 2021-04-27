@@ -30,7 +30,6 @@ const Profile = ({ user, setUser }) => {
     })
       .then((res) => res.json())
       .then((newUser) => {
-        console.log(newUser);
         setUser(newUser);
       })
       .catch((err) => {

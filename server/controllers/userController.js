@@ -20,14 +20,10 @@ userController.checkUser = (req, res, next) => {
     } else {
       if (!result.rows.length) {
         // if the user is not in the database, add them
-        console.log(
-          "User does not exist in database. Need to add user to the database."
-        );
         return next();
       } else {
         // if the user is in the database, send back user information and rediret to home page
         // res.locals.user = result.rows[0];
-        console.log("User exists in the database. Redirecting to home page.");
         return res.redirect("http://localhost:8080");
       }
     }
@@ -36,7 +32,6 @@ userController.checkUser = (req, res, next) => {
 
 userController.findInterests = (req, res, next) => {
   if (!res.locals.user) return next();
-  console.log(res.locals.user);
   const username = [res.locals.user._id]; // save Github username on req.body
   const statement = `SELECT p.*, i1.frontend, i1.backend FROM interests AS i1 INNER JOIN interests AS i2 ON i1.frontend = i2.frontend OR i1.backend = i2.backend INNER JOIN people AS p ON i1._id = p._id WHERE i2._id = $1`;
 
@@ -51,14 +46,12 @@ userController.findInterests = (req, res, next) => {
       });
     } else {
       if (!result.rows.length) {
-        console.log("User does not have any matching in database.");
         return res.status(200).json(res.locals.user);
       } else {
         const interestsArr = result.rows.filter(
           (obj) => `${obj._id}` != res.locals.user._id
         );
         res.locals.user.interests = interestsArr;
-        console.log("User exists in the database. Redirecting to home page.");
         return res.status(200).json(res.locals.user);
       }
     }
@@ -87,9 +80,6 @@ userController.addUser = (req, res, next) => {
       });
     } else {
       res.locals.user = result.rows[0];
-      console.log(
-        "User was successfully added to the database. Redirecting to home page."
-      );
       return next();
     }
   });
@@ -113,8 +103,6 @@ userController.getCurUser = (req, res, next) => {
 };
 
 userController.getUserInfo = (req, res, next) => {
-  // if (!res.locals.jwtInfo) return res.json(false);
-  console.log(req.body);
   const userId = req.body._id * 1;
   const statement = `SELECT p.*, i.frontend, i.backend FROM people AS p LEFT JOIN interests AS i ON i._id = p._id WHERE p._id = $1`;
   db.query(statement, [userId], (err, result) => {
@@ -153,9 +141,6 @@ userController.addInterests = (req, res, next) => {
         },
       });
     } else {
-      console.log(
-        "Interests was successfully added to the database. Redirecting to home page."
-      );
       return next();
     }
   });
@@ -174,9 +159,6 @@ userController.addBio = (req, res, next) => {
         },
       });
     } else {
-      console.log(
-        "User bio info was successfully added to the database. Redirecting to home page."
-      );
       return next();
     }
   });
@@ -197,7 +179,6 @@ userController.checkProfile = (req, res, next) => {
     } else {
       // if the user doesn't have a profile set up, res.locals.profile will be empty and the user info page will display nothing. otherwise, user info page should display data on res.locals.profile
       res.locals.profile = result.rows[0];
-      console.log("User profile found.");
       return next();
     }
   });
@@ -218,8 +199,6 @@ userController.addProfile = (req, res, next) => {
       });
     } else {
       res.locals.profile = result.rows[0];
-      console.log("User profile added to the database.");
-      console.log(result.rows[0]);
       return next();
     }
   });
@@ -243,7 +222,6 @@ userController.getAllUsers = (req, res, next) => {
           .json({ err: "There are no users in the database." });
       } else {
         res.locals.allUsers = result.rows;
-        console.log("Returning all users to the swipe screen.");
         return next();
       }
     }
@@ -252,7 +230,6 @@ userController.getAllUsers = (req, res, next) => {
 
 // inserts pair into potentials table
 userController.addPotential = (req, res, next) => {
-  console.log(req.body);
   const potentialPair = [
     req.body.userId,
     req.body.username,
@@ -270,9 +247,6 @@ userController.addPotential = (req, res, next) => {
         },
       });
     } else {
-      console.log(
-        `Potential pair was successfully added to 'Potentials' table.`
-      );
       return next(); // should also remove from allUsers list for current user -> stretch?
     }
   });
@@ -307,7 +281,6 @@ userController.filterMatches = (req, res, next) => {
           .json({ err: "The query to filter matches returned nothing." });
       } else {
         res.locals.filteredMatches = result.rows;
-        console.log("Returning filtered matches.");
         return next();
       }
     }
@@ -323,7 +296,6 @@ userController.filterMatches = (req, res, next) => {
  */
 
 userController.checkForSwipe = (req, res, next) => {
-  console.log("check for swipe engaged");
   const queryInfo = [req.body.userId, req.body.targetId];
   const statement = `SELECT * FROM matches where user_id = $1 AND target_id = $2`;
 
@@ -336,7 +308,6 @@ userController.checkForSwipe = (req, res, next) => {
         },
       });
     } else {
-      console.log("checkForSwipe result.rows\n", result.rows);
       res.locals.swipes = result.rows;
       return next();
     }
@@ -344,14 +315,8 @@ userController.checkForSwipe = (req, res, next) => {
 };
 
 userController.updateSwipes = (req, res, next) => {
-  console.log("update swipes engaged");
-
   const queryInfo = [req.body.userId, req.body.targetId];
   let statement;
-  console.log(
-    "res.locals.swipes.length === 0\n",
-    res.locals.swipes.length === 0
-  );
   if (res.locals.swipes.length === 0) {
     statement = `INSERT INTO matches (user_id, target_id, swipe, match_status) VALUES ($1, $2, TRUE, FALSE) RETURNING *`;
   } else {
@@ -366,7 +331,6 @@ userController.updateSwipes = (req, res, next) => {
         },
       });
     } else {
-      console.log("updateSwipes result.rows\n", result.rows);
       res.locals.swipes = result.rows;
       return next();
     }
@@ -374,8 +338,6 @@ userController.updateSwipes = (req, res, next) => {
 };
 
 userController.checkIfMatchMade = (req, res, next) => {
-  console.log("checkIfMatchMade engaged");
-
   const queryInfo = [req.body.userId, req.body.targetId];
   const statement = `SELECT * FROM matches WHERE (user_id = $1 AND target_id = $2) OR (user_id = $2 AND target_id = $1)`;
 
@@ -388,7 +350,6 @@ userController.checkIfMatchMade = (req, res, next) => {
         },
       });
     } else {
-      console.log("checkIfMatchMade result.rows\n", result.rows);
       res.locals.matches = result.rows;
       return next();
     }
@@ -396,8 +357,6 @@ userController.checkIfMatchMade = (req, res, next) => {
 };
 
 userController.updateMatches = (req, res, next) => {
-  console.log("updateMatches engaged");
-
   const queryInfo = [req.body.userId, req.body.targetId];
   const statement = `UPDATE matches set match_status = TRUE WHERE (user_id = $1 AND target_id = $2) OR (user_id = $2 AND target_id = $1)`;
 
@@ -406,7 +365,6 @@ userController.updateMatches = (req, res, next) => {
     res.locals.matches[0].swipe &&
     res.locals.matches[1].swipe
   ) {
-    console.log("THERE WAS A MATCH MADE!!!!");
     db.query(statement, queryInfo, (err, result) => {
       if (err) {
         return next({
@@ -416,12 +374,10 @@ userController.updateMatches = (req, res, next) => {
           },
         });
       } else {
-        console.log("updateMatches result.rows\n", result.rows);
         return next();
       }
     });
   } else {
-    console.log("no match was made");
     return next();
   }
 };
@@ -439,7 +395,6 @@ userController.returnMatches = (req, res, next) => {
         },
       });
     } else {
-      console.log("returnMatches result.rows\n", result.rows);
       res.locals.matches = result.rows;
       return next();
     }
@@ -464,19 +419,14 @@ userController.getAllPotentials = (req, res, next) => {
         },
       });
     } else {
-      console.log("getAllPotentials result.rows\n", result.rows);
       res.locals.potentials = result.rows;
       return next();
     }
   });
 };
 
-
 userController.removeMatch = (req, res, next) => {
-  const queryInfo = [
-    req.body.userId, 
-    req.body.targetId
-  ];
+  const queryInfo = [req.body.userId, req.body.targetId];
   const statement = `DELETE FROM matches WHERE (user_id = $1 AND target_id = $2) OR (user_id = $2 AND target_id = $1);`;
 
   db.query(statement, queryInfo, (err, result) => {
@@ -488,7 +438,6 @@ userController.removeMatch = (req, res, next) => {
         },
       });
     } else {
-      console.log("removeMatch result.rows\n", result.rows);
       res.locals.potentials = result.rows;
       return next();
     }

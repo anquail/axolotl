@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Switch, Route, withRouter } from "react-router-dom";
-import Login from "./pages/login.jsx";
+import Login from "./pages/Login.jsx";
 import NavBar from "./components/NavBar.jsx";
 import Home from "./pages/Home.jsx";
 import Profile from "./pages/Profile.jsx";
@@ -37,7 +37,6 @@ const App = React.memo(({ history }) => {
         },
         body: JSON.stringify({
           userId: user._id,
-          //request more info to populate profile cards
         }),
       })
         .then((response) => response.json())

@@ -21,12 +21,12 @@ function Matches({ user, matches, setMatches, history }) {
         if (Array.isArray(data)) setMatches(data);
       })
       .catch((err) => {
-        console.log(err, "matche error!");
+        console.log(err, "match error!");
       });
   }, []);
 
   const generateProfileCards = () => {
-    if (matches.length) {
+    if (matches.length)
       return matches.map((match, i) => (
         <ProfileCard
           key={`ProfileCard ${i}`}
@@ -35,7 +35,6 @@ function Matches({ user, matches, setMatches, history }) {
           setMatches={setMatches}
         />
       ));
-    }
   };
 
   return (

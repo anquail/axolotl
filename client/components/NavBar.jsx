@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, withRouter, useLocation } from "react-router-dom";
 
-const NavBar = (props) => {
+const NavBar = () => {
   let { pathname } = useLocation();
 
   return (

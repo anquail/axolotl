@@ -4,7 +4,7 @@ import UserCard from "../components/UserCard.jsx";
 import fetch from "isomorphic-fetch";
 
 const Home = ({ user, interests, interestIdx, setInterestIdx }) => {
-  const handleSwipe = (e, decision) => {
+  const handleSwipe = (decision) => {
     if (decision === "accept") {
       fetch("/users/swipe", {
         method: "POST",
@@ -20,7 +20,7 @@ const Home = ({ user, interests, interestIdx, setInterestIdx }) => {
     setInterestIdx(interestIdx + 1);
   };
 
-  if (Object.keys(user).length && interests[interestIdx]) {
+  if (Object.keys(user).length && interests[interestIdx])
     return (
       <div className="mainContainer">
         <UserCard
@@ -29,15 +29,14 @@ const Home = ({ user, interests, interestIdx, setInterestIdx }) => {
         />
       </div>
     );
-  } else if (!Object.keys(user).length) {
-    return <h1>Loading...</h1>;
-  } else {
-    return (
-      <div>
-        <h1>OUT OF MATCHES</h1>
-        <button onClick={() => setInterestIdx(0)}>Refresh Matches</button>
-      </div>
-    );
-  }
+  else if (!Object.keys(user).length) return <h1>Loading...</h1>;
+
+  return (
+    <div>
+      <h1>OUT OF MATCHES</h1>
+      <button onClick={() => setInterestIdx(0)}>Refresh Matches</button>
+    </div>
+  );
 };
+
 export default Home;
